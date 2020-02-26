@@ -81,7 +81,7 @@ object PasswordHasher {
   import lidraughts.common.{ IpAddress, HTTPRequest }
 
   private val rateLimitPerIP = new RateLimit[IpAddress](
-    credits = 20 * 2, // double cost in case of hash check failure
+    credits = 30 * 2, // double cost in case of hash check failure
     duration = 10 minutes,
     name = "Password hashes per IP",
     key = "password.hashes.ip"
