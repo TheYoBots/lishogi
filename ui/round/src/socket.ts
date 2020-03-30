@@ -47,13 +47,11 @@ export function make(send: SocketSend, ctrl: RoundController): RoundSocket {
     });
   };
 
-  const d = ctrl.data;
-
   const handlers: Handlers = {
     takebackOffers(o) {
       ctrl.setLoading(false);
-      d.player.proposingTakeback = o[d.player.color];
-      const fromOp = d.opponent.proposingTakeback = o[d.opponent.color];
+      ctrl.data.player.proposingTakeback = o[ctrl.data.player.color];
+      const fromOp = ctrl.data.opponent.proposingTakeback = o[ctrl.data.opponent.color];
       if (fromOp) notify(ctrl.noarg('yourOpponentProposesATakeback'));
       ctrl.redraw();
     },
@@ -69,34 +67,34 @@ export function make(send: SocketSend, ctrl: RoundController): RoundSocket {
     },
     cclock(o) {
       if (ctrl.corresClock) {
-        d.correspondence.white = o.white;
-        d.correspondence.black = o.black;
+        ctrl.data.correspondence.white = o.white;
+        ctrl.data.correspondence.black = o.black;
         ctrl.corresClock.update(o.white, o.black);
         ctrl.redraw();
       }
     },
     crowd(o) {
-      game.setOnGame(d, 'white', o['white']);
-      game.setOnGame(d, 'black', o['black']);
+      game.setOnGame(ctrl.data, 'white', o['white']);
+      game.setOnGame(ctrl.data, 'black', o['black']);
       ctrl.redraw();
     },
     endData(o: ApiEnd) {
       ctrl.endWithData(o);
     },
     rematchOffer(by: Color) {
-      d.player.offeringRematch = by === d.player.color;
-      if (d.opponent.offeringRematch = by === d.opponent.color)
+      ctrl.data.player.offeringRematch = by === ctrl.data.player.color;
+      if (ctrl.data.opponent.offeringRematch = by === ctrl.data.opponent.color)
         notify(ctrl.noarg('yourOpponentWantsToPlayANewGameWithYou'));
       ctrl.redraw();
     },
     rematchTaken(nextId: string) {
-      d.game.rematch = nextId;
-      if (!d.player.spectator) ctrl.setLoading(true);
+      ctrl.data.game.rematch = nextId;
+      if (!ctrl.data.player.spectator) ctrl.setLoading(true);
       else ctrl.redraw();
     },
     drawOffer(by) {
-      d.player.offeringDraw = by === d.player.color;
-      const fromOp = d.opponent.offeringDraw = by === d.opponent.color;
+      ctrl.data.player.offeringDraw = by === ctrl.data.player.color;
+      const fromOp = ctrl.data.opponent.offeringDraw = by === ctrl.data.opponent.color;
       if (fromOp) notify(ctrl.noarg('yourOpponentOffersADraw'));
       ctrl.redraw();
     },
@@ -104,13 +102,13 @@ export function make(send: SocketSend, ctrl: RoundController): RoundSocket {
       ctrl.setBerserk(color);
     },
     gone(isGone) {
-      if (!d.opponent.ai) {
-        game.setIsGone(d, d.opponent.color, isGone);
+      if (!ctrl.data.opponent.ai) {
+        game.setIsGone(ctrl.data, ctrl.data.opponent.color, isGone);
         ctrl.redraw();
       }
     },
     kingMoves(e) {
-      if (d.pref.showKingMoves) {
+      if (ctrl.data.pref.showKingMoves) {
         ctrl.draughtsground.setKingMoves({ 
           white: { count: e.white, key: e.whiteKing },
           black: { count: e.black, key: e.blackKing }
@@ -120,10 +118,10 @@ export function make(send: SocketSend, ctrl: RoundController): RoundSocket {
     },
     simulPlayerMove(gameId: string) {
       if (ctrl.opts.userId &&
-        d.simul &&
-        ctrl.opts.userId == d.simul.hostId) {
+        ctrl.data.simul &&
+        ctrl.opts.userId == ctrl.data.simul.hostId) {
         incSimulToMove(ctrl.trans);
-        if (gameId !== d.game.id &&
+        if (gameId !== ctrl.data.game.id &&
           ctrl.moveOn.get() &&
           !isPlayerTurn(ctrl.data)) {
             ctrl.setRedirecting();
@@ -148,7 +146,7 @@ export function make(send: SocketSend, ctrl: RoundController): RoundSocket {
     send,
     handlers,
     moreTime: throttle(300, () => send('moretime')),
-    outoftime: throttle(500, () => send('flag', d.game.player)),
+    outoftime: throttle(500, () => send('flag', ctrl.data.game.player)),
     berserk: throttle(200, () => send('berserk', null, { ackable: true })),
     sendLoading(typ: string, data?: any) {
       ctrl.setLoading(true);
