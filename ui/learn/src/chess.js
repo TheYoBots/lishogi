@@ -79,8 +79,9 @@ module.exports = function (fen, appleKeys) {
       return compat.makeLishogiFen(fenUtil.makeFen(shogi.toSetup()));
     },
     move: function (orig, dest, prom) {
+      var capturedPiece = shogi.board.get(compat.parseChessSquare(dest));
       shogi.play({from: compat.parseChessSquare(orig), to: compat.parseChessSquare(dest), promotion: prom});
-      return { from: orig, to: dest, promotion: prom };
+      return { from: orig, to: dest, promotion: prom, captured: capturedPiece };
     },
     occupation: function () {
       return shogi.board;
