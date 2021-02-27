@@ -8,6 +8,7 @@ var stageComplete = require("./stageComplete");
 var renderPromotion = require("../promotion").view;
 var renderProgress = require("../progress").view;
 var makeStars = require("../progress").makeStars;
+var renderPocket = require("../crazy/crazyView").renderPocket;
 
 function renderFailed(ctrl) {
   return m(
@@ -84,6 +85,7 @@ module.exports = function (ctrl) {
         renderPromotion(ctrl, level),
         renderInfo(ctrl),
       ]),
+      renderPocket(ctrl, "top", level.blueprint.hasPocket),
       m("div.learn__table", [
         m("div.wrap", [
           m("div.title", [
@@ -106,6 +108,7 @@ module.exports = function (ctrl) {
           renderProgress(ctrl.progress),
         ]),
       ]),
+      renderPocket(ctrl, "bottom", level.blueprint.hasPocket),
     ]
   );
 };
