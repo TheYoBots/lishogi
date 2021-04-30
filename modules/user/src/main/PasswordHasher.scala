@@ -82,7 +82,7 @@ object PasswordHasher {
 
   private val rateLimitPerIP = new RateLimit[IpAddress](
     credits = 40 * 2, // double cost in case of hash check failure
-    duration = 10 minutes,
+    duration = 8 minutes,
     name = "Password hashes per IP",
     key = "password.hashes.ip"
   )
