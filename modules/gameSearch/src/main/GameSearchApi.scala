@@ -67,6 +67,53 @@ final class GameSearchApi(
     case _ => funit
   }
 
+  def validate(maxEntries: Int) = {
+    import play.api.libs.iteratee._
+    import reactivemongo.api.ReadPreference
+    import lidraughts.db.dsl._
+    import draughts.format.pdn.{ Reader, Tags, Tag }
+    import Game.{ BSONFields => F }
+    val batchSize = 1000
+    def moveString(g: draughts.DraughtsGame) = s"${1 + (g.turns - 1) / 2}${g.player.fold("...", ".")}"
+    val noImport: Bdoc = F.pdnImport $exists false
+    GameRepo.sortedCursor(
+      selector = noImport,
+      sort = lidraughts.game.Query.sortAntiChronological
+    )
+      .enumerator(maxEntries)
+      .&>(Enumeratee.grouped(Iteratee takeUpTo batchSize))
+      .|>>>(
+        Iteratee.foldM[Seq[Game], (Int, List[String])](0 -> List.empty[String]) {
+          case ((nb, log), games) =>
+            val resultsFu = games.map { g =>
+              for {
+                fen <- if (!g.variant.standardInitialPosition) GameRepo.initialFen(g) else fuccess(none)
+                moves = g.pdnMovesConcat(true, true)
+                tags = List(Tag("GameType", g.variant.gameType).some, fen.map(Tag("FEN", _))).flatten
+              } yield {
+                Reader.moves(moves, Tags(tags), true).toOption match {
+                  case Some(Reader.Result.Incomplete(replay, _)) =>
+                    val line = s"${g.id} - incomplete after ${moveString(replay.state)} ${~replay.moves.headOption.map(_.toSan)}"
+                    logger.info(line)
+                    line.some
+                  case None =>
+                    val line = s"${g.id} - error"
+                    logger.info(line)
+                    line.some
+                  case _ => none
+                }
+              }
+            }.sequenceFu
+            resultsFu map { res =>
+              val lines = res.flatten.toList
+              val total = nb + games.size
+              logger.info(s"Validated $total games")
+              total -> (lines ::: log)
+            }
+        }
+      ).addEffect(lines => lines._2.foreach(println(_)))
+  }
+
   private def storable(game: Game) = game.finished || game.imported
 
   private def toDoc(game: Game, analysed: Boolean) = Json.obj(

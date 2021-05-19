@@ -23,6 +23,9 @@ final class Env(
   def cli = new lidraughts.common.Cli {
     def process = {
       case "game" :: "search" :: "reset" :: Nil => api.reset inject "done"
+      case "game" :: "validate" :: count :: Nil if count == "all" || parseIntOption(count).isDefined =>
+        val maxEntries = if (count == "all") Int.MaxValue else ~parseIntOption(count)
+        api.validate(maxEntries) inject "done"
     }
   }
 
