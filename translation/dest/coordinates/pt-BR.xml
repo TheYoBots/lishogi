@@ -4,7 +4,7 @@
   <string name="coordinateTraining">Treinamento de coordenadas</string>
   <string name="averageScoreAsWhiteX">Pontuação média com as brancas: %s</string>
   <string name="averageScoreAsBlackX">Pontuação média com as pretas: %s</string>
-  <string name="knowingTheDraughtsBoard">Saber as coordenadas do tabuleiro é habilidade enxadrística muito importante:</string>
+  <string name="knowingTheDraughtsBoard">Saber as coordenadas do tabuleiro é habilidade damística muito importante:</string>
   <string name="mostDraughtsCourses">A maioria dos cursos e exercícios de damas usa extensivamente a notação de numeração algébrica.</string>
   <string name="talkToYourDraughtsFriends">Isso torna mais fácil falar com seus amigos de damas, já que vocês entendem a \"linguagem do tabuleiro\".</string>
   <string name="youCanAnalyseAGameMoreEffectively">Você pode analisar um jogo mais eficientemente se não precisar ficar procurando os nomes das casas.</string>

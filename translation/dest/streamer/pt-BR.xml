@@ -15,10 +15,10 @@
   <string name="downloadKit">Baixar o kit de streamer</string>
   <string name="xIsStreaming">%s está transmitindo</string>
   <string name="rules">Regras de transmissão</string>
-  <string name="rule1">Inclua \"lidraughts.org\" no título da sua transmissão quando for transmitir no Lidraughts.</string>
+  <string name="rule1">Inclua a palavra-chave \"lidraughts.org\" no título da sua transmissão quando for transmitir no Lidraughts.</string>
   <string name="rule2">O remova quando for transmitir coisas não relacionadas ao Lidraughts.</string>
   <string name="rule3">O Lidraughts automaticamente detectará a sua transmissão e te garantirá as seguintes melhorias:</string>
-  <string name="perks">Benefícios de se transmitir com o teclado</string>
+  <string name="perks">Benefícios de transmitir com a palavra-chave</string>
   <string name="perk1">Obtenha um ícone de streamer em chamas no seu perfil do Lidraughts.</string>
   <string name="perk2">Suba ao topo da lista de streamers.</string>
   <string name="perk3">Notifique seus seguidores no Lidraughts.</string>

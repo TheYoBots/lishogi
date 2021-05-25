@@ -24,6 +24,9 @@
   <string name="teamRecentMembers">Últimos membros</string>
   <string name="kickSomeone">Expulsar alguém da equipe</string>
   <string name="whoToKick">Quem você quer expulsar da equipe?</string>
+  <string name="deleteTeamWarning">Exclui a equipe e seus participantes. Não pode ser revertido!</string>
+  <string name="appointOwner">Nomear outro proprietário da equipe</string>
+  <string name="changeOwner">Quem você quer nomear proprietário desta equipe?</string>
   <plurals name="xJoinRequests">
     <item quantity="one">%s pedido de adesão</item>
     <item quantity="other">%s pedidos de adesão</item>
@@ -34,6 +37,9 @@
   <string name="teamBattleOverview">Uma batalha de várias equipes, cada jogador marca pontos para sua equipe</string>
   <string name="teamTournament">Torneio da equipe</string>
   <string name="teamTournamentOverview">Um torneio de Arena em que apenas membros da sua equipe podem participar</string>
+  <string name="swissTournament">Torneio suíço</string>
+  <string name="swissTournamentOverview">Um torneio suíço que apenas membros da sua equipe podem participar</string>
+  <string name="subscribeToTeamMessages">Inscreva-se para acompanhar as mensagens da equipe</string>
   <string name="messageAllMembers">Mensagem para todos os membros</string>
   <string name="messageAllMembersOverview">Enviar uma mensagem privada para todos os membros da equipe</string>
   <string name="messageAllMembersLongDescription">Enviar uma mensagem privada para TODOS os membros da equipe.
@@ -43,4 +49,5 @@ Jogadores que não gostem de receber suas mensagens podem deixar a equipe.</stri
   <string name="youMayWantToLinkOneOfTheseTournaments">Talvez você queira enviar o link de algum destes torneios futuros?</string>
   <string name="usersWhoCanManageThisTeam">Usuários que podem gerenciar esta equipe</string>
   <string name="leadersChat">Chat dos líderes</string>
+  <string name="enableMembersChat">Habilitar caixa de chat (para membros apenas)</string>
 </resources>
