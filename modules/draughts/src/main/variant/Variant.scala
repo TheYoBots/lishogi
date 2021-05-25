@@ -70,14 +70,13 @@ abstract class Variant private[variant] (
     }(breakOut)
   }
 
-  def validMovesFrom(situation: Situation, pos: Pos, finalSquare: Boolean = false): List[Move] = situation.actorAt(pos) match {
-    case Some(actor) => {
-      val captures = if (finalSquare) actor.capturesFinal else actor.captures
-      if (captures.nonEmpty) captures
-      else actor.noncaptures
+  def validMovesFrom(situation: Situation, pos: Pos, finalSquare: Boolean = false): List[Move] =
+    situation.actorAt(pos) match {
+      case Some(actor) =>
+        if (situation.hasCaptures) actor.getCaptures(finalSquare)
+        else actor.noncaptures
+      case _ => Nil
     }
-    case _ => Nil
-  }
 
   def validMoves(actor: Actor): List[Move] = {
     val captures = actor.captures

@@ -25,6 +25,12 @@ case class Situation(board: Board, color: Color) {
         Math.max(actor.captureLength, max)
     }
 
+  def hasCaptures = actors.foldLeft(false) {
+    case (capture, actor) =>
+      if (capture) true
+      else actor.captures.nonEmpty
+  }
+
   def ambiguitiesMove(move: Move): Int = ambiguitiesMove(move.orig, move.dest)
   def ambiguitiesMove(orig: Pos, dest: Pos): Int = countAmbiguities(movesFrom(orig, true).filter(_.dest == dest))
 

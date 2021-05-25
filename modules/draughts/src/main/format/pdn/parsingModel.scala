@@ -51,7 +51,9 @@ case class Std(
     situation.board.pieces.foldLeft(none[draughts.Move]) {
       case (None, (pos, piece)) if piece.color == situation.color && pos == src =>
         val a = Actor(piece, situation.board.posAt(pos), situation.board)
-        a.validMoves.find { m =>
+        // TODO: technically we should check situation.hasCaptures instead of actor
+        val validMoves = if (a.captures.nonEmpty) a.captures else a.noncaptures
+        validMoves.find { m =>
           m.dest == dest && (!iteratedCapts || m.situationAfter.ghosts == 0)
         } match {
           case None if capture && iteratedCapts =>
