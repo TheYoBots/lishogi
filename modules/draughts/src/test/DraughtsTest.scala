@@ -34,9 +34,4 @@ trait DraughtsTest extends Specification with ValidationMatchers {
   def makeGame: DraughtsGame = DraughtsGame(makeBoard, White)
 
   def sortPoss(poss: Seq[Pos]): Seq[Pos] = poss sortBy (_.toString)
-
-  def pieceMoves(piece: Piece, pos: Pos): Option[List[Pos]] =
-    (makeEmptyBoard place piece at pos).toOption flatMap { b =>
-      b actorAt pos map (_.allDestinations)
-    }
 }

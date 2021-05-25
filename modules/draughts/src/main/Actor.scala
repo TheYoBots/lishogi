@@ -8,13 +8,9 @@ case class Actor(
     board: Board
 ) {
 
-  lazy val validMoves: List[Move] = if (captures.nonEmpty) captures else noncaptures
-  lazy val allMoves: List[Move] = captures ::: noncaptures
   lazy val noncaptures: List[Move] = noncaptureMoves()
   lazy val captures: List[Move] = captureMoves(false)
   lazy val capturesFinal: List[Move] = captureMoves(true)
-
-  lazy val allDestinations: List[Pos] = allMoves map (_.dest)
 
   lazy val captureLength = captures.foldLeft(0) {
     case (max, move) =>
