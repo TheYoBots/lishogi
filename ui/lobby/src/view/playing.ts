@@ -19,12 +19,12 @@ export default function(ctrl: LobbyController) {
         board = pov.variant.board,
         title64 = u.title && u.title.endsWith('-64');
       return h('a.' + pov.variant.key, {
-        key: `${pov.gameId}${pov.lastMove}`,
+        key: `${pov.gameId}${pov.lastMove || ''}`,
         attrs: { href: '/' + pov.fullId }
       }, [
         h('span.mini-board.cg-wrap.is2d.is' + board.key, {
           attrs: {
-            'data-state': `${pov.fen}|${board.size[0]}x${board.size[1]}|${pov.color}|${pov.lastMove}`
+            'data-state': `${pov.fen}|${board.size[0]}x${board.size[1]}|${pov.color}|${pov.lastMove || ''}`
           },
           hook: {
             insert(vnode) {

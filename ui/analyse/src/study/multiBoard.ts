@@ -164,7 +164,7 @@ function makeCg(preview: ChapterPreview): VNode {
   const board = preview.board;
   return h('span.mini-board.cg-wrap.is2d.is' + board.key, {
     attrs: {
-      'data-state': `${preview.fen}|${board.size[0]}x${board.size[1]}|${preview.orientation}|${preview.lastMove}`
+      'data-state': `${preview.fen}|${board.size[0]}x${board.size[1]}|${preview.orientation}|${preview.lastMove || ''}`
     },
     hook: {
       insert(vnode) {
@@ -173,7 +173,7 @@ function makeCg(preview: ChapterPreview): VNode {
       },
       postpatch(old, vnode) {
         if (old.data!.fen !== preview.fen) {
-          const lm = preview.lastMove ? String(preview.lastMove) : preview.lastMove!;
+          const lm = preview.lastMove ? String(preview.lastMove) : undefined;
           $(vnode.elm as HTMLElement).data('draughtsground').set({
             fen: preview.fen,
             lastMove: uciToLastMove(lm)
