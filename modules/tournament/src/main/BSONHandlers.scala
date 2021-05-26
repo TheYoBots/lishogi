@@ -51,8 +51,12 @@ object BSONHandlers {
   implicit val tournamentHandler = new BSON[Tournament] {
     def reads(r: BSON.Reader) = {
       val variant = r.intO("variant").fold[Variant](Variant.default)(Variant.orDefault)
-      val position: StartingPosition = r.strO("fen").flatMap(variant.openingByFen) getOrElse
-        variant.startingPosition
+      val openingTable = r.strO("table").flatMap(draughts.OpeningTable.byKey)
+      // NOTE for db-backwards compatibility: fen without containing table specified is always in variant default table
+      val position: StartingPosition = r.strO("fen").flatMap { fen =>
+        val tableOrDefault = if (openingTable.isDefined) openingTable else variant.openingTables.headOption
+        tableOrDefault.fold(none[StartingPosition])(_.openingByFen(fen))
+      } getOrElse variant.startingPosition
       val startsAt = r date "startsAt"
       val conditions = r.getO[Condition.All]("conditions") getOrElse Condition.All.empty
       Tournament(
@@ -64,7 +68,7 @@ object BSONHandlers {
         minutes = r int "minutes",
         variant = variant,
         position = position,
-        openingTable = r.strO("table").flatMap(draughts.OpeningTable.byKey),
+        openingTable = openingTable,
         mode = r.intO("mode") flatMap Mode.apply getOrElse Mode.Rated,
         password = r.strO("password"),
         conditions = conditions,

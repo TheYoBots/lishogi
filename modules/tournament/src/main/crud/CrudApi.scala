@@ -23,9 +23,9 @@ final class CrudApi {
     clockIncrement = tour.clock.incrementSeconds,
     minutes = tour.minutes,
     variant = tour.variant.id,
-    positionStandard = if (tour.variant.standard) tour.openingTable.fold(tour.position.fen)(_.key).some else Standard.initialFen.some,
-    positionRussian = if (tour.variant.russian) tour.openingTable.fold(tour.position.fen)(_.key).some else Russian.initialFen.some,
-    positionBrazilian = if (tour.variant.brazilian) tour.openingTable.fold(tour.position.fen)(_.key).some else Brazilian.initialFen.some,
+    positionStandard = if (tour.variant.standard) tour.positionKey.some else Standard.initialFen.some,
+    positionRussian = if (tour.variant.russian) tour.positionKey.some else Russian.initialFen.some,
+    positionBrazilian = if (tour.variant.brazilian) tour.positionKey.some else Brazilian.initialFen.some,
     date = tour.startsAt,
     image = ~tour.spotlight.flatMap(_.iconImg),
     headline = tour.spotlight.??(_.headline),
@@ -81,12 +81,6 @@ final class CrudApi {
   private def updateTour(tour: Tournament, data: CrudForm.Data) = {
     import data._
     val clock = draughts.Clock.Config((clockTime * 60).toInt, clockIncrement)
-    val position = realVariant match {
-      case Standard => positionStandard
-      case Russian => positionRussian
-      case Brazilian => positionBrazilian
-      case _ => none
-    }
     tour.copy(
       name = name,
       clock = clock,
@@ -107,8 +101,8 @@ final class CrudApi {
         iconFont = none,
         iconImg = image.some.filter(_.nonEmpty)
       ).some,
-      position = DataForm.startingPosition(position | realVariant.initialFen, realVariant),
-      openingTable = position.flatMap(draughts.OpeningTable.byKey).filter(realVariant.openingTables.contains),
+      position = startingPosition,
+      openingTable = openingTable,
       noBerserk = !data.berserkable,
       noStreak = !data.streakable,
       teamBattle = data.teamBattle option (tour.teamBattle | TeamBattle(Set.empty, 10)),

@@ -20,7 +20,10 @@ final class AutoPairing(
       daysPerTurn = none
     )
     val variant = if (tour.variant.standard && !tour.position.initialStandard) draughts.variant.FromPosition else tour.variant
-    val opening = tour.openingTable.fold(-1 -> tour.position) { _.randomOpening }
+    val opening = tour.openingTable.fold(-1 -> tour.position) { table =>
+      if (tour.isThematicRandom) table.randomOpening
+      else -1 -> tour.position
+    }
     val game = Game.make(
       draughts = draughts.DraughtsGame(
         variantOption = Some(variant),
@@ -39,7 +42,7 @@ final class AutoPairing(
       source = Source.Tournament,
       pdnImport = None
     ).withId(pairing.gameId)
-      .withTournamentId(tour.id, tour.openingTable.map(_ => opening._1))
+      .withTournamentId(tour.id, if (opening._1 == -1) none else opening._1.some)
       .start
     (GameRepo insertDenormalized game) >>- {
       onStart(game.id)

@@ -11,17 +11,19 @@ case class StartingPosition(
     featurable: Boolean = true
 ) {
 
-  val shortName = name.fold(code) { n => s"$code - ${n takeWhile (':'!=)}" }
-  val fullName = name.fold(code) { n => s"$code - $n" }
+  val shortName = code
+  val fullName = name.fold(code) { n => s"$code: $n" }
 
   def url = wikiPath.map(u => s"https://en.wikipedia.org/wiki/$u")
-  def initialStandard = fen == Standard.initialFen
-  def initialVariant(v: Variant) = fen == v.initialFen
+  def initialStandard = initialVariant(Standard)
+  def initialVariant(v: Variant) = fen == v.initialFen || fen == v.shortInitialFen
 }
 
 object StartingPosition {
 
   case class Category(name: String, positions: List[StartingPosition])
+
+  val random = StartingPosition("random", "random", "")
 
   /*lazy val featurable = new scala.util.Random(475591).shuffle(all.filter(_.featurable)).toIndexedSeq
 

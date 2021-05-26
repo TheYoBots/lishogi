@@ -15,8 +15,7 @@ case object Brazilian extends Variant(
   def pieces = Russian.pieces
   def initialFen = Russian.initialFen
   def startingPosition = Russian.startingPosition
-  override val openings = OpeningTable.categoriesFMJDBrazilian
-  override val openingTables = List(OpeningTable.tableFMJDBrazilian)
+  override val openingTables = List(OpeningTable.tableFMJDBrazilian, OpeningTable.tableIDFBasic)
 
   def captureDirs = Standard.captureDirs
   def moveDirsColor = Standard.moveDirsColor

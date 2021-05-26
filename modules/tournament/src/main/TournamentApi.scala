@@ -55,12 +55,6 @@ final class TournamentApi(
     getUserTeamIds: User => Fu[List[TeamId]],
     andJoin: Boolean = true
   ): Fu[Tournament] = {
-    val position = setup.realVariant match {
-      case draughts.variant.Standard => setup.positionStandard
-      case draughts.variant.Russian => setup.positionRussian
-      case draughts.variant.Brazilian => setup.positionBrazilian
-      case _ => none
-    }
     val tour = Tournament.make(
       by = Right(me),
       name = DataForm.canPickName(me) ?? setup.name,
@@ -72,8 +66,8 @@ final class TournamentApi(
       password = setup.password,
       system = System.Arena,
       variant = setup.realVariant,
-      position = DataForm.startingPosition(position | setup.realVariant.initialFen, setup.realVariant),
-      openingTable = position.flatMap(draughts.OpeningTable.byKey).filter(setup.realVariant.openingTables.contains),
+      position = setup.startingPosition,
+      openingTable = setup.openingTable,
       berserkable = setup.berserkable | true,
       streakable = setup.streakable | true,
       teamBattle = setup.teamBattleByTeam map TeamBattle.init,
@@ -92,12 +86,6 @@ final class TournamentApi(
 
   def update(old: Tournament, data: TournamentSetup, me: User, myTeams: List[LightTeam]): Funit = {
     import data._
-    val position = realVariant match {
-      case draughts.variant.Standard => positionStandard
-      case draughts.variant.Russian => positionRussian
-      case draughts.variant.Brazilian => positionBrazilian
-      case _ => none
-    }
     val tour = old.copy(
       name = (DataForm.canPickName(me) ?? name) | old.name,
       clock = clockConfig,
@@ -106,16 +94,16 @@ final class TournamentApi(
       password = password,
       variant = realVariant,
       startsAt = startDate | old.startsAt,
-      position = DataForm.startingPosition(position | realVariant.initialFen, realVariant),
-      openingTable = position.flatMap(draughts.OpeningTable.byKey).filter(realVariant.openingTables.contains),
+      position = startingPosition,
+      openingTable = openingTable,
       noBerserk = !(~berserkable),
       noStreak = !(~streakable),
       description = description
     ) |> { tour =>
-        tour.perfType.fold(tour) { perfType =>
-          tour.copy(conditions = conditions.convert(perfType, myTeams.map(_.pair)(collection.breakOut)))
-        }
+      tour.perfType.fold(tour) { perfType =>
+        tour.copy(conditions = conditions.convert(perfType, myTeams.map(_.pair)(collection.breakOut)))
       }
+    }
     sillyNameCheck(tour, me)
     TournamentRepo update tour void
   }

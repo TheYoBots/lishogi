@@ -47,9 +47,9 @@ final class DataForm {
     waitMinutes = none,
     startDate = tour.startsAt.some,
     variant = tour.variant.id.toString.some,
-    positionStandard = if (tour.variant.standard) tour.openingTable.fold(tour.position.fen)(_.key).some else Standard.initialFen.some,
-    positionRussian = if (tour.variant.russian) tour.openingTable.fold(tour.position.fen)(_.key).some else Russian.initialFen.some,
-    positionBrazilian = if (tour.variant.brazilian) tour.openingTable.fold(tour.position.fen)(_.key).some else Brazilian.initialFen.some,
+    positionStandard = if (tour.variant.standard) tour.positionKey.some else Standard.initialFen.some,
+    positionRussian = if (tour.variant.russian) tour.positionKey.some else Russian.initialFen.some,
+    positionBrazilian = if (tour.variant.brazilian) tour.positionKey.some else Brazilian.initialFen.some,
     mode = none,
     rated = tour.mode.rated.some,
     password = tour.password,
@@ -129,9 +129,6 @@ object DataForm {
   def guessVariant(from: String): Option[Variant] = validVariants.find { v =>
     v.key == from || parseIntOption(from).exists(v.id ==)
   }
-
-  def startingPosition(fen: String, variant: Variant): StartingPosition =
-    variant.openingByFen(fen) | variant.startingPosition
 }
 
 private[tournament] case class TournamentSetup(
@@ -142,7 +139,7 @@ private[tournament] case class TournamentSetup(
     waitMinutes: Option[Int],
     startDate: Option[DateTime],
     variant: Option[String],
-    positionStandard: Option[String],
+    positionStandard: Option[String], // tableKey | fen/random
     positionRussian: Option[String], // NOTE: Safe for variants without standard initial position (i.e. 64 squares)
     positionBrazilian: Option[String],
     mode: Option[Int], // deprecated, use rated
@@ -177,4 +174,24 @@ private[tournament] case class TournamentSetup(
   private def estimatedGameSeconds: Double = {
     (60 * clockTime + 30 * clockIncrement) * 2 * 0.8
   } + 15
+
+  private def positionKey = realVariant match {
+    case draughts.variant.Standard => positionStandard
+    case draughts.variant.Russian => positionRussian
+    case draughts.variant.Brazilian => positionBrazilian
+    case _ => none
+  }
+
+  def startingPosition =
+    positionKey.flatMap { key =>
+      val parts = key.split('|')
+      parts.headOption.flatMap(draughts.OpeningTable.byKey).flatMap { table =>
+        parts.lastOption.flatMap(table.openingByFen)
+      }
+    } | realVariant.startingPosition
+
+  def openingTable =
+    positionKey.flatMap { key =>
+      key.split('|').headOption.flatMap(draughts.OpeningTable.byKey)
+    } filter realVariant.openingTables.contains
 }

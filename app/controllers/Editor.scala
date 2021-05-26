@@ -18,11 +18,11 @@ object Editor extends LidraughtsController {
 
   private lazy val positionsJson = lidraughts.common.String.html.safeJsonValue {
     Json.obj(
-      "standard" -> JsArray(Standard.allOpenings map positionJson),
+      "standard" -> JsArray(Standard.openingTables.flatMap(_.positions map positionJson)),
       "draughts64" -> Russian.openingTables.map { table =>
         Json.obj(
           "name" -> table.name,
-          "positions" -> JsArray(Russian.allOpenings map positionJson)
+          "positions" -> JsArray(table.positions map positionJson)
         )
       }
     )

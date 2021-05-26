@@ -147,7 +147,7 @@ object form {
         form3.checkbox(form("conditions.titled"), raw("Only titled players"), help = raw("Require an official title to join the tournament").some, half = true)
       }
     ),
-    (auto && teams.size > 0) option {
+    (auto && teams.nonEmpty) option {
       val baseField = form("conditions.teamMember.teamId")
       val field = ctx.req.queryString get "team" flatMap (_.headOption) match {
         case None => baseField
@@ -169,17 +169,21 @@ object form {
         field.value.has(variant.initialFen) option selected
       )(trans.startPosition()),
       variant.openingTables.map { table =>
+        val key = table.withRandomFen
         option(
-          value := table.key,
-          field.value.has(table.key) option selected
+          value := key,
+          field.value.has(key) option selected
         )(trans.randomOpeningFromX(table.name))
       },
-      variant.openings.map { categ =>
-        optgroup(attr("label") := categ.name)(
-          categ.positions.map { v =>
-            option(value := v.fen, field.value.has(v.fen) option selected)(v.fullName)
-          }
-        )
+      variant.openingTables.flatMap { table =>
+        table.categories.map { categ =>
+          optgroup(attr("label") := s"${categ.name} - ${table.name}")(
+            categ.positions.map { v =>
+              val key = table.withFen(v)
+              option(value := key, field.value.has(key) option selected)(v.fullName)
+            }
+          )
+        }
       }
     )
 }

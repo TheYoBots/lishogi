@@ -1,20 +1,31 @@
 package draughts
 
-case class OpeningTable(key: String, name: String, url: String, positions: List[StartingPosition]) {
+case class OpeningTable(key: String, name: String, url: String, categories: List[StartingPosition.Category]) {
 
-  lazy val shuffled = new scala.util.Random(475592).shuffle(positions).toIndexedSeq
+  val positions = categories.flatMap(_.positions)
+
+  private lazy val shuffled = new scala.util.Random(475592).shuffle(positions).toIndexedSeq
 
   def randomOpening: (Int, StartingPosition) = {
     val index = scala.util.Random.nextInt(shuffled.size)
     index -> shuffled(index)
   }
+
+  private val fen2position: Map[String, StartingPosition] = positions.map { p =>
+    p.fen -> p
+  }(scala.collection.breakOut)
+
+  def openingByFen = fen2position.get _
+
+  def withFen(p: StartingPosition) = s"$key|${p.fen}"
+  def withRandomFen = withFen(StartingPosition.random)
 }
 
 object OpeningTable {
 
   import StartingPosition.Category
 
-  val categoriesFMJD = List(
+  private val categoriesFMJD = List(
     Category("1", List(
       StartingPosition("1-I", "W:W17,21,22,23,24,25,26,27,28,30,31,32:B1,2,3,4,6,7,8,9,11,12,13,14", "1. ab4 ba5 2. ba3 ab6 3. ab2 dc5", "ab4 ba5 ba3 ab6 ab2 dc5".some),
       StartingPosition("1-II", "W:W17,21,22,23,24,25,26,27,28,29,31,32:B1,2,3,4,5,7,8,9,11,12,13,15", "1. ab4 ba5 2. ba3 cb6 3. cb2 de5", "ab4 ba5 ba3 cb6 cb2 de5".some),
@@ -845,7 +856,7 @@ object OpeningTable {
     ))
   )
 
-  val categoriesFMJDBrazilian = categoriesFMJD.map {
+  private val categoriesFMJDBrazilian = categoriesFMJD.map {
     case cat if cat.name == "1" =>
       cat.copy(positions = cat.positions.filterNot(_.code == "1-IX"))
     case cat if cat.name == "4" =>
@@ -869,21 +880,211 @@ object OpeningTable {
     case cat => cat
   }
 
+  private val categoriesIDFBasic = List(
+    Category("1", List(
+      StartingPosition("1-I", "B:W14,21,23,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,10,11,12,13", "1. cd4 ba5 2. dc5", "cd4 ba5 dc5".some),
+      StartingPosition("1-II", "B:W19,21,22,23,24,25,26,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,11,12,14", "1. ef4 dc5 2. fe3", "ef4 dc5 fe3".some),
+      StartingPosition("1-III", "W:W20,21,22,23,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,11,16", "1. gh4 hg5", "gh4 hg5".some),
+      StartingPosition("1-IV", "W:W19,21,22,23,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,11,12,15", "1. gf4 de5", "gf4 de5".some),
+      StartingPosition("1-V", "B:W18,21,22,23,24,25,26,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,12,16", "1. ed4 fg5 2. fe3", "ed4 fg5 fe3".some),
+      StartingPosition("1-VI", "W:W17,21,23,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,11,12,15", "1. cb4 de5", "cb4 de5".some),
+      StartingPosition("1-VII", "W:W20,21,22,23,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,12,16", "1. gh4 fg5", "gh4 fg5".some),
+      StartingPosition("1-VIII", "B:W18,19,21,23,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,10,11,12,14", "1. gf4 bc5 2. cd4", "gf4 bc5 cd4".some),
+      StartingPosition("1-IX", "B:W13,22,23,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,11,16", "1. ab4 hg5 2. ba5", "ab4 hg5 ba5".some),
+      StartingPosition("1-X", "B:W17,20,21,23,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,11,16", "1. gh4 hg5 2. cb4", "gh4 hg5 cb4".some)
+    )),
+    Category("2", List(
+      StartingPosition("2-I", "B:W20,21,22,23,24,25,26,27,29,30,31,32:B1,2,3,4,5,6,7,8,10,11,12,13", "1. gh4 ba5 2. hg3", "gh4 ba5 hg3".some),
+      StartingPosition("2-II", "B:W18,20,21,23,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,11,16", "1. cd4 hg5 2. gh4", "cd4 hg5 gh4".some),
+      StartingPosition("2-III", "B:W17,19,21,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,12,16", "1. ef4 fg5 2. cb4", "ef4 fg5 cb4".some),
+      StartingPosition("2-IV", "B:W13,22,23,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,12,15", "1. ef4 fe5 2. ab4", "ef4 fe5 ab4".some),
+      StartingPosition("2-V", "B:W13,22,23,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,12,15", "1. ab4 fe5 2. ba5", "ab4 fe5 ba5".some),
+      StartingPosition("2-VI", "W:W19,21,22,23,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,10,11,12,14", "1. gf4 bc5", "gf4 bc5".some),
+      StartingPosition("2-VII", "B:W17,19,22,23,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,11,16", "1. ab4 hg5 2. gf4", "ab4 hg5 gf4".some),
+      StartingPosition("2-VIII", "W:W18,21,22,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,12,15", "1. ed4 fe5", "ed4 fe5".some),
+      StartingPosition("2-IX", "B:W17,20,21,23,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,11,12,14", "1. gh4 dc5 2. cb4", "gh4 dc5 cb4".some),
+      StartingPosition("2-X", "B:W18,19,21,23,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,10,11,12,13", "1. gf4 ba5 2. cd4", "gf4 ba5 cd4".some)
+    )),
+    Category("3", List(
+      StartingPosition("3-I", "B:W14,21,23,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,12,16", "1. cd4 fg5 2. dc5", "cd4 fg5 dc5".some),
+      StartingPosition("3-II", "B:W20,21,22,23,24,25,26,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,11,12,14", "1. gh4 dc5 2. fg3", "gh4 dc5 fg3".some),
+      StartingPosition("3-III", "B:W19,21,22,23,24,25,26,27,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,12,15", "1. gf4 fe5 2. hg3", "gf4 fe5 hg3".some),
+      StartingPosition("3-IV", "W:W17,21,23,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,11,16", "1. cb4 hg5", "cb4 hg5".some),
+      StartingPosition("3-V", "W:W17,22,23,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,11,12,15", "1. ab4 de5", "ab4 de5".some),
+      StartingPosition("3-VI", "B:W17,20,21,23,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,11,12,15", "1. gh4 de5 2. cb4", "gh4 de5 cb4".some),
+      StartingPosition("3-VII", "W:W19,21,22,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,10,11,12,13", "1. ef4 ba5", "ef4 ba5".some),
+      StartingPosition("3-VIII", "W:W17,21,23,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,12,16", "1. cb4 fg5", "cb4 fg5".some),
+      StartingPosition("3-IX", "B:W20,21,22,23,24,25,26,28,29,30,31,32:B1,2,3,4,5,6,7,8,10,11,12,14", "1. gh4 bc5 2. fg3", "gh4 bc5 fg3".some),
+      StartingPosition("3-X", "B:W19,21,22,23,24,25,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,11,12,14", "1. ef4 dc5 2. de3", "ef4 dc5 de3".some)
+    )),
+    Category("4", List(
+      StartingPosition("4-I", "B:W17,21,22,23,24,25,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,12,15", "1. cb4 fe5 2. dc3", "cb4 fe5 dc3".some),
+      StartingPosition("4-II", "B:W18,20,21,23,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,10,11,12,14", "1. gh4 bc5 2. cd4", "gh4 bc5 cd4".some),
+      StartingPosition("4-III", "B:W14,22,23,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,12,16", "1. ab4 fg5 2. bc5", "ab4 fg5 bc5".some),
+      StartingPosition("4-IV", "B:W18,20,21,23,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,11,12,14", "1. cd4 dc5 2. gh4", "cd4 dc5 gh4".some),
+      StartingPosition("4-V", "B:W17,20,22,23,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,12,15", "1. ab4 fe5 2. gh4", "ab4 fe5 gh4".some),
+      StartingPosition("4-VI", "W:W20,21,22,23,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,10,11,12,13", "1. gh4 ba5", "gh4 ba5".some),
+      StartingPosition("4-VII", "B:W14,22,23,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,12,15", "1. ab4 fe5 2. bc5", "ab4 fe5 bc5".some),
+      StartingPosition("4-VIII", "B:W19,21,22,23,24,25,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,12,15", "1. ef4 fe5 2. de3", "ef4 fe5 de3".some),
+      StartingPosition("4-IX", "B:W17,20,22,23,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,10,11,12,13", "1. ab4 ba5 2. gh4", "ab4 ba5 gh4".some),
+      StartingPosition("4-X", "B:W20,21,22,23,24,25,26,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,11,12,15", "1. gh4 de5 2. fg3", "gh4 de5 fg3".some)
+    )),
+    Category("5", List(
+      StartingPosition("5-I", "W:W19,21,22,23,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,12,16", "1. gf4 fg5", "gf4 fg5".some),
+      StartingPosition("5-II", "W:W20,21,22,23,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,10,11,12,14", "1. gh4 bc5", "gh4 bc5".some),
+      StartingPosition("5-III", "B:W17,21,22,23,24,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,10,11,12,13", "1. ab4 ba5 2. ba3", "ab4 ba5 ba3".some),
+      StartingPosition("5-IV", "B:W13,22,23,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,11,12,15", "1. ab4 de5 2. ba5", "ab4 de5 ba5".some),
+      StartingPosition("5-V", "W:W18,21,23,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,11,16", "1. cd4 hg5", "cd4 hg5".some),
+      StartingPosition("5-VI", "W:W18,21,23,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,12,16", "1. cd4 fg5", "cd4 fg5".some),
+      StartingPosition("5-VII", "W:W21,22,23,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,11,12", "1. Free", "Free".some),
+      StartingPosition("5-VIII", "B:W20,21,22,23,24,25,26,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,11,16", "1. gh4 hg5 2. fg3", "gh4 hg5 fg3".some),
+      StartingPosition("5-IX", "B:W17,21,22,23,24,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,12,16", "1. ab4 fg5 2. ba3", "ab4 fg5 ba3".some),
+      StartingPosition("5-X", "B:W20,21,22,23,24,25,26,28,29,30,31,32:B1,2,3,4,5,6,7,8,10,11,12,13", "1. gh4 ba5 2. fg3", "gh4 ba5 fg3".some)
+    )),
+    Category("6", List(
+      StartingPosition("6-I", "W:W17,21,23,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,10,11,12,14", "1. cb4 bc5", "cb4 bc5".some),
+      StartingPosition("6-II", "B:W19,21,22,23,24,25,26,27,29,30,31,32:B1,2,3,4,5,6,7,8,10,11,12,13", "1. gf4 ba5 2. hg3", "gf4 ba5 hg3".some),
+      StartingPosition("6-III", "B:W17,21,22,23,24,25,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,10,11,12,13", "1. cb4 ba5 2. dc3", "cb4 ba5 dc3".some),
+      StartingPosition("6-IV", "W:W18,21,22,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,12,16", "1. ed4 fg5", "ed4 fg5".some),
+      StartingPosition("6-V", "B:W17,19,21,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,11,12,14", "1. ef4 dc5 2. cb4", "ef4 dc5 cb4".some),
+      StartingPosition("6-VI", "B:W18,21,22,23,24,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,11,12,15", "1. cd4 de5 2. bc3", "cd4 de5 bc3".some),
+      StartingPosition("6-VII", "W:W19,21,22,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,12,16", "1. ef4 fg5", "ef4 fg5".some),
+      StartingPosition("6-VIII", "B:W17,20,22,23,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,11,12,15", "1. ab4 de5 2. gh4", "ab4 de5 gh4".some),
+      StartingPosition("6-IX", "B:W17,18,22,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,11,12,15", "1. ed4 de5 2. ab4", "ed4 de5 ab4".some),
+      StartingPosition("6-X", "B:W17,21,22,23,24,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,12,15", "1. cb4 fe5 2. bc3", "cb4 fe5 bc3".some)
+    )),
+    Category("7", List(
+      StartingPosition("7-I", "B:W18,21,22,23,24,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,12,16", "1. cd4 fg5 2. bc3", "cd4 fg5 bc3".some),
+      StartingPosition("7-II", "W:W18,21,23,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,12,15", "1. cd4 fe5", "cd4 fe5".some),
+      StartingPosition("7-III", "B:W18,21,22,23,24,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,11,16", "1. cd4 hg5 2. bc3", "cd4 hg5 bc3".some),
+      StartingPosition("7-IV", "W:W19,21,22,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,10,11,12,14", "1. ef4 bc5", "ef4 bc5".some),
+      StartingPosition("7-V", "B:W20,21,22,23,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,11,12", "1. gh4", "gh4".some),
+      StartingPosition("7-VI", "W:W17,21,23,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,11,12,14", "1. cb4 dc5", "cb4 dc5".some),
+      StartingPosition("7-VII", "B:W14,21,23,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,12,15", "1. cb4 fe5 2. bc5", "cb4 fe5 bc5".some),
+      StartingPosition("7-VIII", "B:W18,21,22,23,24,25,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,12,16", "1. ed4 fg5 2. de3", "ed4 fg5 de3".some),
+      StartingPosition("7-IX", "W:W18,21,22,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,11,16", "1. ed4 hg5", "ed4 hg5".some),
+      StartingPosition("7-X", "B:W18,21,22,23,24,25,26,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,11,12,14", "1. ed4 dc5 2. fe3", "ed4 dc5 fe3".some)
+    )),
+    Category("8", List(
+      StartingPosition("8-I", "W:W17,22,23,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,12,16", "1. ab4 fg5", "ab4 fg5".some),
+      StartingPosition("8-II", "W:W18,21,23,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,11,12,15", "1. cd4 de5", "cd4 de5".some),
+      StartingPosition("8-III", "B:W17,21,22,23,24,25,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,12,16", "1. cb4 fg5 2. dc3", "cb4 fg5 dc3".some),
+      StartingPosition("8-IV", "B:W19,21,22,23,24,25,26,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,12,15", "1. ef4 fe5 2. fe3", "ef4 fe5 fe3".some),
+      StartingPosition("8-V", "B:W18,21,22,23,24,25,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,11,12,14", "1. ed4 dc5 2. de3", "ed4 dc5 de3".some),
+      StartingPosition("8-VI", "B:W19,21,22,23,24,25,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,10,11,12,14", "1. ef4 bc5 2. de3", "ef4 bc5 de3".some),
+      StartingPosition("8-VII", "W:W18,21,22,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,10,11,12,14", "1. ed4 bc5", "ed4 bc5".some),
+      StartingPosition("8-VIII", "W:W18,21,23,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,11,12,14", "1. cd4 dc5", "cd4 dc5".some),
+      StartingPosition("8-IX", "B:W13,21,23,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,10,11,12,14", "1. cb4 bc5 2. ba5", "cb4 bc5 ba5".some),
+      StartingPosition("8-X", "B:W17,19,21,23,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,12,16", "1. gf4 fg5 2. cb4", "gf4 fg5 cb4".some)
+    )),
+    Category("9", List(
+      StartingPosition("9-I", "W:W17,22,23,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,12,15", "1. ab4 fe5", "ab4 fe5".some),
+      StartingPosition("9-II", "B:W17,19,21,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,12,15", "1. ef4 fe5 2. cb4", "ef4 fe5 cb4".some),
+      StartingPosition("9-III", "B:W13,22,23,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,12,16", "1. ab4 fg5 2. ba5", "ab4 fg5 ba5".some),
+      StartingPosition("9-IV", "B:W17,21,22,23,24,25,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,10,11,12,14", "1. cb4 bc5 2. dc3", "cb4 bc5 dc3".some),
+      StartingPosition("9-V", "W:W18,21,22,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,11,12,14", "1. ed4 dc5", "ed4 dc5".some),
+      StartingPosition("9-VI", "B:W13,22,23,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,10,11,12,14", "1. ab4 bc5 2. ba5", "ab4 bc5 ba5".some),
+      StartingPosition("9-VII", "W:W19,21,22,23,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,12,15", "1. gf4 fe5", "gf4 fe5".some),
+      StartingPosition("9-VIII", "B:W19,21,22,23,24,25,26,28,29,30,31,32:B1,2,3,4,5,6,7,8,10,11,12,14", "1. gf4 bc5 2. fg3", "gf4 bc5 fg3".some),
+      StartingPosition("9-IX", "W:W20,21,22,23,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,11,12,14", "1. gh4 dc5", "gh4 dc5".some),
+      StartingPosition("9-X", "B:W19,21,22,23,24,25,26,27,29,30,31,32:B1,2,3,4,5,6,7,8,10,11,12,14", "1. gf4 bc5 2. hg3", "gf4 bc5 hg3".some)
+    )),
+    Category("10", List(
+      StartingPosition("10-I", "W:W18,21,23,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,10,11,12,13", "1. cd4 ba5", "cd4 ba5".some),
+      StartingPosition("10-II", "B:W19,21,22,23,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,11,12", "1. gf4", "gf4".some),
+      StartingPosition("10-III", "W:W17,21,23,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,12,15", "1. cb4 fe5", "cb4 fe5".some),
+      StartingPosition("10-IV", "B:W18,19,21,23,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,11,12,15", "1. cd4 de5 2. gf4", "cd4 de5 gf4".some),
+      StartingPosition("10-V", "B:W18,20,21,22,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,11,16", "1. ed4 hg5 2. gh4", "ed4 hg5 gh4".some),
+      StartingPosition("10-VI", "W:W19,21,22,23,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,10,11,12,13", "1. gf4 ba5", "gf4 ba5".some),
+      StartingPosition("10-VII", "B:W18,19,21,23,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,11,16", "1. cd4 hg5 2. gf4", "cd4 hg5 gf4".some),
+      StartingPosition("10-VIII", "B:W17,19,21,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,11,12,15", "1. cb4 de5 2. ef4", "cb4 de5 ef4".some),
+      StartingPosition("10-IX", "B:W17,20,21,23,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,10,11,12,14", "1. gh4 bc5 2. cb4", "gh4 bc5 cb4".some),
+      StartingPosition("10-X", "W:W18,21,23,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,10,11,12,14", "1. cd4 bc5", "cd4 bc5".some)
+    )),
+    Category("11", List(
+      StartingPosition("11-I", "B:W19,21,22,23,24,25,26,28,29,30,31,32:B1,2,3,4,5,6,7,8,10,11,12,13", "1. ef4 ba5 2. fe3", "ef4 ba5 fe3".some),
+      StartingPosition("11-II", "W:W19,21,22,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,11,12,15", "1. ef4 de5", "ef4 de5".some),
+      StartingPosition("11-III", "B:W17,18,22,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,10,11,12,13", "1. ed4 ba5 2. ab4", "ed4 ba5 ab4".some),
+      StartingPosition("11-IV", "B:W13,21,23,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,11,16", "1. cb4 hg5 2. ba5", "cb4 hg5 ba5".some),
+      StartingPosition("11-V", "B:W17,21,22,23,24,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,11,16", "1. ab4 hg5 2. ba3", "ab4 hg5 ba3".some),
+      StartingPosition("11-VI", "B:W17,20,22,23,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,11,16", "1. ab4 hg5 2. gh4", "ab4 hg5 gh4".some),
+      StartingPosition("11-VII", "B:W14,21,22,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,10,11,12,13", "1. ed4 ba5 2. dc5", "ed4 ba5 dc5".some),
+      StartingPosition("11-VIII", "W:W17,22,23,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,10,11,12,13", "1. ab4 ba5", "ab4 ba5".some),
+      StartingPosition("11-IX", "B:W18,19,21,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,10,11,12,13", "1. ef4 ba5 2. cd4", "ef4 ba5 cd4".some),
+      StartingPosition("11-X", "B:W19,21,22,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,11,12", "1. ef4", "ef4".some)
+    )),
+    Category("12", List(
+      StartingPosition("12-I", "B:W18,20,21,22,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,12,15", "1. gh4 fe5 2. ed4", "gh4 fe5 ed4".some),
+      StartingPosition("12-II", "B:W17,19,21,23,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,10,11,12,13", "1. gf4 ba5 2. cb4", "gf4 ba5 cb4".some),
+      StartingPosition("12-III", "W:W17,22,23,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,11,16", "1. ab4 hg5", "ab4 hg5".some),
+      StartingPosition("12-IV", "W:W17,22,23,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,10,11,12,14", "1. ab4 bc5", "ab4 bc5".some),
+      StartingPosition("12-V", "B:W18,21,23,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,11,12", "1. cd4", "cd4".some),
+      StartingPosition("12-VI", "B:W17,20,21,23,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,12,16", "1. cb4 fg5 2. gh4", "cb4 fg5 gh4".some),
+      StartingPosition("12-VII", "B:W20,21,22,23,24,25,26,27,29,30,31,32:B1,2,3,4,5,6,7,8,9,11,12,14", "1. gh4 dc5 2. hg3", "gh4 dc5 hg3".some),
+      StartingPosition("12-VIII", "B:W18,21,22,23,24,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,10,11,12,13", "1. cd4 ba5 2. bc3", "cd4 ba5 bc3".some),
+      StartingPosition("12-IX", "B:W17,21,22,23,24,25,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,11,12,15", "1. cb4 de5 2. dc3", "cb4 de5 dc3".some),
+      StartingPosition("12-X", "B:W14,22,23,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,11,16", "1. ab4 hg5 2. bc5", "ab4 hg5 bc5".some)
+    )),
+    Category("13", List(
+      StartingPosition("13-I", "B:W18,21,22,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,11,12", "1. ed4", "ed4".some),
+      StartingPosition("13-II", "B:W17,19,21,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,10,11,12,14", "1. ef4 bc5 2. cb4", "ef4 bc5 cb4".some),
+      StartingPosition("13-III", "W:W19,21,22,23,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,11,12,14", "1. gf4 dc5", "gf4 dc5".some),
+      StartingPosition("13-IV", "B:W18,19,21,23,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,12,16", "1. gf4 fg5 2. cd4", "gf4 fg5 cd4".some),
+      StartingPosition("13-V", "W:W19,21,22,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,12,15", "1. ef4 fe5", "ef4 fe5".some),
+      StartingPosition("13-VI", "B:W13,21,23,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,12,15", "1. cb4 fe5 2. ba5", "cb4 fe5 ba5".some),
+      StartingPosition("13-VII", "W:W18,21,22,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,10,11,12,13", "1. ed4 ba5", "ed4 ba5".some),
+      StartingPosition("13-VIII", "W:W17,21,23,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,10,11,12,13", "1. cb4 ba5", "cb4 ba5".some),
+      StartingPosition("13-IX", "B:W20,21,22,23,24,25,26,27,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,11,16", "1. gh4 hg5 2. hg3", "gh4 hg5 hg3".some),
+      StartingPosition("13-X", "B:W20,21,22,23,24,25,26,27,29,30,31,32:B1,2,3,4,5,6,7,8,9,11,12,15", "1. gh4 de5 2. hg3", "gh4 de5 hg3".some)
+    )),
+    Category("14", List(
+      StartingPosition("14-I", "B:W17,19,21,23,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,11,12,14", "1. gf4 dc5 2. cb4", "gf4 dc5 cb4".some),
+      StartingPosition("14-II", "B:W17,22,23,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,11,12", "1. ab4", "ab4".some),
+      StartingPosition("14-III", "B:W18,21,22,23,24,25,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,11,12,15", "1. cd4 de5 2. dc3", "cd4 de5 dc3".some),
+      StartingPosition("14-IV", "B:W17,18,21,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,12,16", "1. ed4 fg5 2. cb4", "ed4 fg5 cb4".some),
+      StartingPosition("14-V", "B:W17,21,22,23,24,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,11,12,15", "1. cb4 de5 2. bc3", "cb4 de5 bc3".some),
+      StartingPosition("14-VI", "B:W18,19,21,23,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,11,12,14", "1. gf4 dc5 2. cd4", "gf4 dc5 cd4".some),
+      StartingPosition("14-VII", "W:W18,21,22,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,11,12,15", "1. ed4 de5", "ed4 de5".some),
+      StartingPosition("14-VIII", "B:W20,21,22,23,24,25,26,27,29,30,31,32:B1,2,3,4,5,6,7,8,10,11,12,14", "1. gh4 bc5 2. hg3", "gh4 bc5 hg3".some),
+      StartingPosition("14-IX", "W:W19,21,22,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,11,12,14", "1. ef4 dc5", "ef4 dc5".some),
+      StartingPosition("14-X", "B:W17,19,21,23,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,10,11,12,14", "1. gf4 bc5 2. cb4", "gf4 bc5 cb4".some)
+    )),
+    Category("15", List(
+      StartingPosition("15-I", "W:W17,22,23,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,11,12,14", "1. ab4 dc5", "ab4 dc5".some),
+      StartingPosition("15-II", "W:W20,21,22,23,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,12,15", "1. gh4 fe5", "gh4 fe5".some),
+      StartingPosition("15-III", "B:W13,21,23,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,11,12,15", "1. cb4 de5 2. ba5", "cb4 de5 ba5".some),
+      StartingPosition("15-IV", "B:W18,20,21,22,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,12,16", "1. ed4 fg5 2. gh4", "ed4 fg5 gh4".some),
+      StartingPosition("15-V", "W:W20,21,22,23,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,11,12,15", "1. gh4 de5", "gh4 de5".some),
+      StartingPosition("15-VI", "B:W18,20,21,22,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,11,12,15", "1. ed4 de5 2. gh4", "ed4 de5 gh4".some),
+      StartingPosition("15-VII", "B:W17,21,23,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,11,12", "1. cb4", "cb4".some),
+      StartingPosition("15-VIII", "B:W17,21,22,23,24,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,10,11,12,14", "1. cb4 bc5 2. bc3", "cb4 bc5 bc3".some),
+      StartingPosition("15-IX", "B:W17,19,21,23,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,11,16", "1. cb4 hg5 2. gf4", "cb4 hg5 gf4".some),
+      StartingPosition("15-X", "B:W17,20,21,23,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,9,10,12,15", "1. gh4 fe5 2. cb4", "gh4 fe5 cb4".some)
+    ))
+  )
+
   val tableFMJD = OpeningTable(
     key = "fmjd",
-    name = "FMJD Drawing Tables 64",
+    name = "FMJD Drawing Table 64",
     url = "https://results.fmjd.org/viewpage.php?page_id=2",
-    positions = categoriesFMJD.flatMap(_.positions)
+    categories = categoriesFMJD
   )
 
   val tableFMJDBrazilian = OpeningTable(
     key = "fmjdBrazilian",
-    name = "FMJD Drawing Tables 64 - Brazilian",
+    name = "FMJD Drawing Table 64 - Brazilian",
     url = "https://results.fmjd.org/viewpage.php?page_id=2",
-    positions = categoriesFMJDBrazilian.flatMap(_.positions)
+    categories = categoriesFMJDBrazilian
   )
 
-  private val allTables = List(tableFMJD, tableFMJDBrazilian)
+  val tableIDFBasic = OpeningTable(
+    key = "idfBasic",
+    name = "IDF Drawing Table 64 - Basic Positions",
+    url = "https://idf64.org/tables-of-draw/",
+    categories = categoriesIDFBasic
+  )
+
+  private val allTables = List(tableFMJD, tableFMJDBrazilian, tableIDFBasic)
   private val key2table: Map[String, OpeningTable] = allTables.map { p =>
     p.key -> p
   }(scala.collection.breakOut)

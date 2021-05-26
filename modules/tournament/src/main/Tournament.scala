@@ -58,12 +58,18 @@ case class Tournament(
       case _ => s"$name $system"
     }
 
+  def positionKey = openingTable.fold(position.fen) { table =>
+    if (isThematicRandom) table.withRandomFen
+    else table.withFen(position)
+  }
+
   def isMarathon = schedule.map(_.freq) exists {
     case Schedule.Freq.ExperimentalMarathon | Schedule.Freq.Marathon => true
     case _ => false
   }
 
   def isThematic = openingTable.isDefined || !position.initialVariant(variant)
+  def isThematicRandom = openingTable.isDefined && (position.initialVariant(variant) || position.fen == "random")
 
   def isShield = schedule.map(_.freq) has Schedule.Freq.Shield
 

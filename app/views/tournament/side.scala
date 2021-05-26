@@ -83,16 +83,13 @@ object side {
       !tour.isScheduled option frag(trans.by(userIdLink(tour.createdBy.some)), br),
       (!tour.isStarted || (tour.isScheduled && tour.isThematic)) option absClientDateTime(tour.startsAt),
       tour.isThematic option p(cls := "opening")(
-        tour.openingTable.fold(frag(
-          tour.position.url.fold(openingPosition(tour.position)) { url =>
-            a(target := "_blank", href := url)(
-              openingPosition(tour.position)
-            )
-          },
-          separator,
-          a(href := routes.UserAnalysis.parse(tour.variant.key + "/" + tour.position.fen.replace(" ", "_")))(trans.analysis())
-        )) { table =>
-          trans.randomOpeningFromX(
+        tour.openingTable.fold(openingLink(tour)) { table =>
+          if (!tour.isThematicRandom) frag(
+            a(target := "_blank", href := table.url)(table.name),
+            br,
+            openingLink(tour)
+          )
+          else trans.randomOpeningFromX(
             a(target := "_blank", href := table.url)(table.name)
           )
         }
@@ -104,6 +101,16 @@ object side {
 
   private def openingPosition(position: draughts.StartingPosition) = frag(
     strong(position.code), " ", position.name
+  )
+
+  private def openingLink(tour: Tournament)(implicit ctx: Context) = frag(
+    tour.position.url.fold(openingPosition(tour.position)) { url =>
+      a(target := "_blank", href := url)(
+        openingPosition(tour.position)
+      )
+    },
+    separator,
+    a(href := routes.UserAnalysis.parse(tour.variant.key + "/" + tour.position.fen.replace(" ", "_")))(trans.analysis())
   )
 
   private def teamBattle(tour: Tournament)(battle: TeamBattle)(implicit ctx: Context) =

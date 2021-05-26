@@ -87,6 +87,26 @@ object CrudForm {
     def validTiming = password.isDefined || (minutes * 60) >= (3 * estimatedGameDuration)
 
     private def estimatedGameDuration = 60 * clockTime + 30 * clockIncrement
+
+    private def positionKey = realVariant match {
+      case draughts.variant.Standard => positionStandard
+      case draughts.variant.Russian => positionRussian
+      case draughts.variant.Brazilian => positionBrazilian
+      case _ => none
+    }
+
+    def startingPosition =
+      positionKey.flatMap { key =>
+        val parts = key.split('|')
+        parts.headOption.flatMap(draughts.OpeningTable.byKey).flatMap { table =>
+          parts.lastOption.flatMap(table.openingByFen)
+        }
+      } | realVariant.startingPosition
+
+    def openingTable =
+      positionKey.flatMap { key =>
+        key.split('|').headOption.flatMap(draughts.OpeningTable.byKey)
+      } filter realVariant.openingTables.contains
   }
 
   val imageChoices = List(
