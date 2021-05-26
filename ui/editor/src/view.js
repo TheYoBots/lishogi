@@ -38,12 +38,15 @@ function studyButton(ctrl, fen) {
 
 function controls(ctrl, fen) {
   var currentPosition = ctrl.positionMap[fen.split(':').slice(0, 3).join(':')];
+  let selectedPosition = false;
   var position2option = function(pos) {
+    const selected = !selectedPosition && currentPosition && currentPosition.fen === pos.fen;
+    if (selected) selectedPosition = true;
     return {
       tag: 'option',
       attrs: {
         value: pos.fen,
-        selected: currentPosition && currentPosition.fen === pos.fen
+        selected: selected
       },
       children: [pos.code ? pos.code + ': ' + pos.name : pos.name]
     };

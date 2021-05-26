@@ -39,7 +39,8 @@ module.exports = function(cfg) {
       positions = cfg.positions && cfg.positions[this.positionsKey()];
     if (positions) positions.forEach(function(cat) { 
       cat.positions.forEach(function(pos) {
-        positionMap[pos.fen.split(':').slice(0, 3).join(':')] = pos;
+        const fen = pos.fen.split(':').slice(0, 3).join(':');
+        if (!positionMap.hasOwnProperty(fen)) positionMap[fen] = pos;
       });
     });
     this.positionMap = positionMap
