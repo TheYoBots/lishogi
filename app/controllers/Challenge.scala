@@ -165,6 +165,8 @@ object Challenge extends LidraughtsController {
           destUser ?? { Env.challenge.granter(me.some, _, config.perfType) } flatMap {
             case Some(denied) =>
               BadRequest(jsonError(lidraughts.challenge.ChallengeDenied.translated(denied))).fuccess
+            case _ if destUser.exists(_.id == me.id) =>
+              BadRequest(jsonError("You can't challenge yourself")).fuccess
             case _ =>
               import lidraughts.challenge.Challenge._
               val challenge = lidraughts.challenge.Challenge.make(
@@ -204,6 +206,8 @@ object Challenge extends LidraughtsController {
           challengerOption ?? { challengerUser =>
             config.opponent.fold(BadRequest(jsonError("Opponent not specified")).fuccess) { opponentId =>
               UserRepo enabledById opponentId.toLowerCase flatMap {
+                case Some(opponentUser) if opponentUser.id == challengerUser.id =>
+                  BadRequest(jsonError("Opponent and challenger can't be the same")).fuccess
                 case Some(opponentUser) =>
                   import lidraughts.challenge.Challenge._
                   val challenge = lidraughts.challenge.Challenge.make(
