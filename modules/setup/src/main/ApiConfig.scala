@@ -53,7 +53,7 @@ object ApiConfig extends BaseHumanConfig {
   def <<(v: Option[String], cl: Option[Clock.Config], d: Option[Int], r: Boolean, c: Option[String], pos: Option[String], opp: Option[String], start: Option[DateTime], mm: Option[Boolean]) =
     new ApiConfig(
       variant = draughts.variant.Variant.orDefault(~v),
-      clock = cl,
+      clock = cl.filter(c => c.limitSeconds > 0 || c.hasIncrement),
       days = d,
       rated = r,
       color = Color.orDefault(~c),
