@@ -855,9 +855,9 @@ Een URL per regel</string>
     <item quantity="one">Eén %2$s speler deze maand.</item>
     <item quantity="other">%1$s %2$s spelers deze maand.</item>
   </plurals>
-  <string name="yourPerfTypeRatingIsRating">Je %1$srating is %2$s.</string>
-  <string name="youAreBetterThanPercentOfPerfTypePlayers">Je bent beter dan %1$s van de %2$sspelers.</string>
-  <string name="youDoNotHaveAnEstablishedPerfTypeRating">Je hebt geen vastgestelde %srating.</string>
+  <string name="yourPerfTypeRatingIsRating">Je %1$s rating is %2$s.</string>
+  <string name="youAreBetterThanPercentOfPerfTypePlayers">Je bent beter dan %1$s van de %2$s spelers.</string>
+  <string name="youDoNotHaveAnEstablishedPerfTypeRating">Je hebt geen vastgestelde %s rating.</string>
   <string name="yourRating">Jouw rating</string>
   <string name="cumulative">Cumulatief</string>
   <string name="glicko2Rating">Glicko-2 rating</string>
