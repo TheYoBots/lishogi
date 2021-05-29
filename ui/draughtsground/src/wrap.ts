@@ -3,7 +3,7 @@ import { colors, translateAway, translateAbs, posToTranslateAbs, key2pos, create
 import { ranksRev as allRanks, files as allFiles } from './util'
 import { createElement as createSVG } from './svg'
 import { boardFields } from './board'
-import { Elements} from './types'
+import { Elements, FieldNumber } from './types'
 
 export default function wrap(element: HTMLElement, s: State, relative: boolean): Elements {
 
@@ -66,7 +66,7 @@ export default function wrap(element: HTMLElement, s: State, relative: boolean):
         container.appendChild(renderCoords(files, 'files is100'));
       }
     } else if (!relative && s.coordinates === 1) {
-      renderFieldnumbers(container, s, board.getBoundingClientRect());
+      renderFieldnumbers(board, s, board.getBoundingClientRect());
     }
   }
 
@@ -89,9 +89,12 @@ function renderFieldnumbers(element: HTMLElement, s: State, bounds: ClientRect) 
   const asWhite = s.orientation !== 'black',
     count = boardFields(s);
   for (let f = 1; f <= count; f++) {
-    const field = createEl('fieldnumber', 'black'), san = f.toString();
-    field.textContent = s.coordSystem === 1 ? san2alg[san] : san ;
-    const coords = posToTranslateAbs(bounds, s.boardSize)(key2pos(allKeys[f - 1], s.boardSize), asWhite, 0);
+    const field = createEl('fieldnumber', 'black') as FieldNumber, 
+      san = f.toString(),
+      k = allKeys[f - 1];
+    field.textContent = s.coordSystem === 1 ? san2alg[san] : san;
+    field.cgKey = k;
+    const coords = posToTranslateAbs(bounds, s.boardSize)(key2pos(k, s.boardSize), asWhite);
     translateAbs(field, [coords['0'], coords['1']]);
     element.appendChild(field);
   }

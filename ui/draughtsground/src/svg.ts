@@ -25,10 +25,11 @@ type Hash = string;
 
 export function renderSvg(state: State, root: SVGElement): void {
 
-  const d = state.drawable, curD = d.current, arrowDests: ArrowDests = {};
-
-  const cur = curD && (curD.mouseSq || curD.prev) ? curD as DrawShape : undefined;
-
+  const d = state.drawable,
+    curD = d.current,
+    cur = curD && (curD.mouseSq || curD.prev) ? curD as DrawShape : undefined,
+    arrowDests: ArrowDests = {},
+    bounds = state.dom.bounds();
 
   d.shapes.concat(d.autoShapes).concat(cur ? [cur] : []).forEach(s => {
     if (s.dest) arrowDests[s.dest] = (arrowDests[s.dest] || 0) + 1;
@@ -38,14 +39,14 @@ export function renderSvg(state: State, root: SVGElement): void {
     return {
       shape: s,
       current: false,
-      hash: shapeHash(s, arrowDests, false)
+      hash: shapeHash(s, arrowDests, false, bounds)
     };
   });
   if (cur) {
     shapes.push({
       shape: cur,
       current: true,
-      hash: shapeHash(cur, arrowDests, true)
+      hash: shapeHash(cur, arrowDests, true, bounds)
     });
   }
 
@@ -105,15 +106,15 @@ function syncShapes(state: State, shapes: Shape[], brushes: DrawBrushes, arrowDe
   });
 }
 
-function shapeHash({ orig, dest, brush, piece, modifiers }: DrawShape, arrowDests: ArrowDests, current: boolean): Hash {
-  return [current, orig, dest, brush, dest && arrowDests[dest] > 1,
+function shapeHash({ orig, dest, brush, piece, modifiers }: DrawShape, arrowDests: ArrowDests, current: boolean, bounds: ClientRect): Hash {
+  return [bounds.width, bounds.height, current, orig, dest, brush, dest && arrowDests[dest] > 1,
     piece && pieceHash(piece),
     modifiers && modifiersHash(modifiers)
-  ].filter(x => x).join('');
+  ].filter(x => x).join(',');
 }
 
 function pieceHash(piece: DrawShapePiece): Hash {
-  return [piece.color, piece.role, piece.scale].filter(x => x).join('');
+  return [piece.color, piece.role, piece.scale].filter(x => x).join(',');
 }
 
 function modifiersHash(m: DrawModifiers): Hash {

@@ -17,7 +17,7 @@ interface SquareClasses { [key: string]: string }
 
 // ported from https://github.com/veloce/lichobile/blob/master/src/js/draughtsground/view.js
 // in case of bugs, blame @veloce
-export default function render(s: State): void {
+export function render(s: State): void {
   const asWhite: boolean = whitePov(s),
     bs = s.boardSize,
     posToTranslate = s.dom.relative ? util.posToTranslateRel(bs) : util.posToTranslateAbs(s.dom.bounds(), bs),
@@ -237,11 +237,30 @@ export default function render(s: State): void {
 
 }
 
-function isPieceNode(el: cg.PieceNode | cg.SquareNode): el is cg.PieceNode {
+export function updateBounds(s: State) {
+  if (s.dom.relative) return;
+  const asWhite: boolean = whitePov(s),
+    posToTranslate = util.posToTranslateAbs(s.dom.bounds(), s.boardSize);
+  let el = s.dom.elements.board.firstChild as HTMLElement | undefined;
+  while (el) {
+    if ((isPieceNode(el) && !el.cgAnimating) || isSquareNode(el) || isFieldNumber(el)) {
+      if (isFieldNumber(el)) {
+        console.log('update fieldnumber: ', el);
+      }
+      util.translateAbs(el, posToTranslate(key2pos(el.cgKey, s.boardSize), asWhite));
+    }
+    el = el.nextSibling as HTMLElement | undefined;
+  }
+}
+
+function isPieceNode(el: HTMLElement): el is cg.PieceNode {
   return el.tagName === 'PIECE';
 }
-function isSquareNode(el: cg.PieceNode | cg.SquareNode): el is cg.SquareNode {
+function isSquareNode(el: HTMLElement): el is cg.SquareNode {
   return el.tagName === 'SQUARE';
+}
+function isFieldNumber(el: HTMLElement): el is cg.FieldNumber {
+  return el.tagName === 'FIELDNUMBER';
 }
 
 function removeNodes(s: State, nodes: HTMLElement[]): void {

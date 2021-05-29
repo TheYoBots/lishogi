@@ -71,7 +71,7 @@ const posToTranslateBase: (pos: cg.Pos, boardSize: cg.BoardSize, asWhite: boolea
 
 export const posToTranslateAbs = (bounds: ClientRect, boardSize: cg.BoardSize) => {
   const xFactor = bounds.width / (boardSize[0] / 2), yFactor = bounds.height / boardSize[1];
-  return (pos: cg.Pos, asWhite: boolean, shift: number) => posToTranslateBase(pos, boardSize, asWhite, xFactor, yFactor, shift);
+  return (pos: cg.Pos, asWhite: boolean) => posToTranslateBase(pos, boardSize, asWhite, xFactor, yFactor, 0);
 };
 
 export const posToTranslateRel = (boardSize: cg.BoardSize) => {

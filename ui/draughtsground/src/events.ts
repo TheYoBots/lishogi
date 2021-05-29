@@ -8,15 +8,20 @@ import * as cg from './types'
 type MouchBind = (e: cg.MouchEvent) => void;
 type StateMouchBind = (d: State, e: cg.MouchEvent) => void;
 
-export function bindBoard(s: State): void {
+export function bindBoard(s: State, boundsUpdated: () => void): void {
+
+  const boardEl = s.dom.elements.board;
+
+  if (!s.dom.relative && s.resizable && 'ResizeObserver' in window) {
+    const observer = new (window as any)['ResizeObserver'](boundsUpdated);
+    observer.observe(boardEl);
+  }
 
   if (s.viewOnly) return;
 
-  const boardEl = s.dom.elements.board,
-  onStart = startDragOrDraw(s);
-
   // Cannot be passive, because we prevent touch scrolling and dragging of
   // selected elements.
+  const onStart = startDragOrDraw(s);
   boardEl.addEventListener('touchstart', onStart as EventListener, { passive: false });
   boardEl.addEventListener('mousedown', onStart as EventListener, { passive: false });
 
@@ -26,16 +31,14 @@ export function bindBoard(s: State): void {
 }
 
 // returns the unbind function
-export function bindDocument(s: State, redrawAll: cg.Redraw): cg.Unbind {
+export function bindDocument(s: State, boundsUpdated: () => void): cg.Unbind {
 
   const unbinds: cg.Unbind[] = [];
 
-  if (!s.dom.relative && s.resizable) {
-    const onResize = () => {
-      s.dom.bounds.clear();
-      requestAnimationFrame(redrawAll);
-    };
-    unbinds.push(unbindable(document.body, 'draughtsground.resize', onResize));
+  // Old versions of Edge and Safari do not support ResizeObserver. Send
+  // draughtsground.resize if a user action has changed the bounds of the board.
+  if (!s.dom.relative && s.resizable && !('ResizeObserver' in window)) {
+    unbinds.push(unbindable(document.body, 'draughtsground.resize', boundsUpdated));
   }
 
   if (!s.viewOnly) {

@@ -92,6 +92,7 @@ export interface PieceNode extends KeyedNode {
   cgDragging?: boolean;
 }
 export interface SquareNode extends KeyedNode { }
+export interface FieldNumber extends KeyedNode { }
 
 export interface Memo<A> { (): A; clear: () => void; }
 
