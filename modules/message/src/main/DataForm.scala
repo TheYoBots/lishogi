@@ -27,7 +27,7 @@ private[message] final class DataForm(security: MessageSecurity) {
         user = fetchUser(username) err "Unknown username " + username,
         subject = subject,
         text = text,
-        asMod = mod.isDefined
+        asMod = Granter(_.ModMessage)(me) ?? mod.isDefined
       )
     })(_.export.some))
 

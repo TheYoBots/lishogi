@@ -66,7 +66,7 @@ final class MessageApi(
           text = data.text,
           creatorId = me.id,
           invitedId = data.user.id,
-          asMod = data.asMod
+          asMod = Granter(_.ModMessage)(me) ?? data.asMod
         )
         security.muteThreadIfNecessary(t, me, invited) flatMap { thread =>
           sendUnlessBlocked(thread, fromMod) flatMap {
