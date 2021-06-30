@@ -244,10 +244,7 @@ export function updateBounds(s: State) {
   let el = s.dom.elements.board.firstChild as HTMLElement | undefined;
   while (el) {
     if ((isPieceNode(el) && !el.cgAnimating) || isSquareNode(el) || isFieldNumber(el)) {
-      if (isFieldNumber(el)) {
-        console.log('update fieldnumber: ', el);
-      }
-      util.translateAbs(el, posToTranslate(key2pos(el.cgKey, s.boardSize), asWhite));
+      util.translateAbs(el, posToTranslate(key2pos(el.cgKey, s.boardSize), asWhite, 0));
     }
     el = el.nextSibling as HTMLElement | undefined;
   }

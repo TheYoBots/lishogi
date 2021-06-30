@@ -94,7 +94,7 @@ function renderFieldnumbers(element: HTMLElement, s: State, bounds: ClientRect) 
       k = allKeys[f - 1];
     field.textContent = s.coordSystem === 1 ? san2alg[san] : san;
     field.cgKey = k;
-    const coords = posToTranslateAbs(bounds, s.boardSize)(key2pos(k, s.boardSize), asWhite);
+    const coords = posToTranslateAbs(bounds, s.boardSize)(key2pos(k, s.boardSize), asWhite, 0);
     translateAbs(field, [coords['0'], coords['1']]);
     element.appendChild(field);
   }
