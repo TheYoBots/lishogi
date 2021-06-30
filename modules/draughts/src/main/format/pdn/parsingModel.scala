@@ -77,7 +77,16 @@ case class Std(
 
 case class InitialPosition(
     comments: List[String]
-)
+) {
+
+  def initialFen(v: variant.Variant) =
+    Metas.fenComment(comments, v)
+
+  def withoutInitialFen(v: variant.Variant) =
+    initialFen(v).fold(comments) { init =>
+      comments.filterNot(init.==)
+    }
+}
 
 case class Metas(
     checkmate: Boolean,
@@ -96,10 +105,22 @@ case class Metas(
   def withComments(c: List[String]) = copy(comments = c)
 
   def withVariations(v: List[Sans]) = copy(variations = v)
+
+  def fenComment(v: variant.Variant) =
+    Metas.fenComment(comments, v)
 }
 
 object Metas {
   val empty = Metas(false, Nil, Glyphs.empty, Nil)
+
+  private val fenCommentRegex = """^[WB](:[WB][\w,]*){2}$""".r
+
+  def fenComment(comments: List[String], v: variant.Variant) = comments.reverse.find {
+    case fenCommentRegex(_) => true
+    case _ => false
+  } flatMap { fen =>
+    format.Forsyth.<<<@(v, fen).exists(_.situation playable false) option fen
+  }
 }
 
 case class Suffixes(

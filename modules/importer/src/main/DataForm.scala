@@ -38,67 +38,70 @@ case class ImportData(pdn: String, analyse: Option[String]) {
     case Reader.Result.Incomplete(replay, _) => replay
   }
 
-  def preprocess(user: Option[String]): Valid[Preprocessed] = Parser.full(pdn) flatMap {
-    case parsed @ ParsedPdn(_, tags, sans) => Reader.fullWithSans(
-      pdn,
-      sans => sans.copy(value = sans.value take maxPlies),
-      tags,
-      iteratedCapts = true
-    ) map evenIncomplete map {
-        case replay @ Replay(setup, _, state) =>
-          val initBoard = parsed.tags.fen.map(_.value) flatMap Forsyth.<< map (_.board)
-          val fromPosition = initBoard.nonEmpty && !(parsed.tags.fen.contains(FEN(Forsyth.initial)) || parsed.tags.fen.contains(FEN(Forsyth.initialMoveAndPieces)))
-          val variant = {
-            parsed.tags.variant | {
-              if (fromPosition) draughts.variant.FromPosition
-              else draughts.variant.Standard
-            }
-          } match {
-            case draughts.variant.FromPosition if parsed.tags.fen.isEmpty => draughts.variant.Standard
-            case draughts.variant.Standard if fromPosition => draughts.variant.FromPosition
-            case v => v
-          }
-          val game = state.copy(situation = state.situation withVariant variant)
-          val initialFen = parsed.tags.fen.map(_.value) flatMap {
-            Forsyth.<<<@(variant, _)
-          } map Forsyth.>> map FEN.apply
+  def preprocess(user: Option[String]): Valid[Preprocessed] =
+    Parser.full(pdn) map { parsed =>
+      val replay = Reader.fullWithSans(
+        parsed,
+        sans => sans.copy(value = sans.value take maxPlies),
+        iteratedCapts = true
+      ) |> evenIncomplete
 
-          val status = parsed.tags(_.Termination).map(_.toLowerCase) match {
-            case Some("normal") | None => Status.Resign
-            case Some("abandoned") => Status.Aborted
-            case Some("time forfeit") => Status.Outoftime
-            case Some("rules infraction") => Status.Cheat
-            case Some(_) => Status.UnknownFinish
-          }
-
-          val date = parsed.tags.anyDate
-
-          def name(whichName: TagPicker, whichRating: TagPicker): String = parsed.tags(whichName).fold("?") { n =>
-            n + ~parsed.tags(whichRating).map(e => s" (${e take 8})")
-          }
-
-          val dbGame = Game.make(
-            draughts = game,
-            whitePlayer = Player.make(draughts.White, None) withName name(_.White, _.WhiteElo),
-            blackPlayer = Player.make(draughts.Black, None) withName name(_.Black, _.BlackElo),
-            mode = Mode.Casual,
-            source = Source.Import,
-            pdnImport = PdnImport.make(user = user, date = date, pdn = pdn).some
-          ).sloppy.start |> { dbGame =>
-            // apply the result from the board or the tags
-            game.situation.status match {
-              case Some(situationStatus) => dbGame.finish(situationStatus, game.situation.winner).game
-              case None => parsed.tags.resultColor.map {
-                case Some(color) => TagResult(status, color.some)
-                case None if status == Status.Outoftime => TagResult(status, none)
-                case None => TagResult(Status.Draw, none)
-              }.filter(_.status > Status.Started).fold(dbGame) { res =>
-                dbGame.finish(res.status, res.winner).game
-              }
-            }
-          }
-
-          Preprocessed(NewGame(dbGame), replay.copy(state = game), initialFen, parsed)
+      val initialFen = Forsyth.>>(replay.setup)
+      val fromPosition = initialFen != Forsyth.initial && initialFen != Forsyth.initialMoveAndPieces
+      val variant = {
+        parsed.tags.variant | {
+          if (fromPosition) draughts.variant.FromPosition
+          else draughts.variant.Standard
+        }
+      } match {
+        case draughts.variant.FromPosition if !fromPosition => draughts.variant.Standard
+        case draughts.variant.Standard if fromPosition => draughts.variant.FromPosition
+        case v => v
       }
-  }
+
+      val game = replay.state.copy(situation = replay.state.situation withVariant variant)
+
+      val status = parsed.tags(_.Termination).map(_.toLowerCase) match {
+        case Some("normal") | None => Status.Resign
+        case Some("abandoned") => Status.Aborted
+        case Some("time forfeit") => Status.Outoftime
+        case Some("rules infraction") => Status.Cheat
+        case Some(_) => Status.UnknownFinish
+      }
+
+      val date = parsed.tags.anyDate
+
+      def name(whichName: TagPicker, whichRating: TagPicker): String = parsed.tags(whichName).fold("?") { n =>
+        n + ~parsed.tags(whichRating).map(e => s" (${e take 8})")
+      }
+
+      val dbGame = Game.make(
+        draughts = game,
+        whitePlayer = Player.make(draughts.White, None) withName name(_.White, _.WhiteElo),
+        blackPlayer = Player.make(draughts.Black, None) withName name(_.Black, _.BlackElo),
+        mode = Mode.Casual,
+        source = Source.Import,
+        pdnImport = PdnImport.make(user = user, date = date, pdn = pdn).some
+      ).sloppy.start |> { dbGame =>
+        // apply the result from the board or the tags
+        game.situation.status match {
+          case Some(situationStatus) => dbGame.finish(situationStatus, game.situation.winner).game
+          case None => parsed.tags.resultColor.map {
+            case Some(color) => TagResult(status, color.some)
+            case None if status == Status.Outoftime => TagResult(status, none)
+            case None => TagResult(Status.Draw, none)
+          }.filter(_.status > Status.Started).fold(dbGame) { res =>
+            dbGame.finish(res.status, res.winner).game
+          }
+        }
+      }
+
+      val dropMoves = parsed.sans.value.length - replay.moves.length
+      Preprocessed(
+        NewGame(dbGame),
+        replay.copy(state = game),
+        fromPosition option FEN(initialFen),
+        parsed.copy(sans = draughts.format.pdn.Sans(parsed.sans.value.drop(dropMoves)))
+      )
+    }
 }

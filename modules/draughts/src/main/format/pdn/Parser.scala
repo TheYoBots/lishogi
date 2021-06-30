@@ -20,8 +20,11 @@ object Parser extends scalaz.syntax.ToTraverseOps {
       variations: List[List[StrMove]]
   )
 
+  // remove invisible byte order mark
+  private def cleanUserInput(str: String) = str.replace("""\ufeff""", "")
+
   def full(pdn: String): Valid[ParsedPdn] = try {
-    val preprocessed = pdn.lines.map(_.trim).filter {
+    val preprocessed = cleanUserInput(pdn).lines.map(_.trim).filter {
       _.headOption != Some('%')
     }.mkString("\n")
       .replace("[pgn]", "").replace("[pdn]", "")

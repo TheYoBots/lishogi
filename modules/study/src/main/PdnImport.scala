@@ -29,7 +29,8 @@ object PdnImport {
     ImportData(pdn, analyse = none).preprocess(user = none).map {
       case prep @ Preprocessed(game, replay, initialFen, parsedPdn) =>
         val annotator = findAnnotator(parsedPdn, contributors)
-        parseComments(parsedPdn.initialPosition.comments, annotator, replay.setup.situation.color.some) match {
+        val initialComments = parsedPdn.initialPosition.withoutInitialFen(game.variant)
+        parseComments(initialComments, annotator, replay.setup.situation.color.some) match {
           case (shapes, _, comments) =>
             val root = Node.Root(
               ply = replay.setup.turns,

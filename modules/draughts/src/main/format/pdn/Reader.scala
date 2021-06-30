@@ -18,39 +18,42 @@ object Reader {
     }
   }
 
-  def full(pdn: String, tags: Tags = Tags.empty): Valid[Result] =
-    fullWithSans(pdn, identity, tags, true)
-
   def moves(moveStrs: Traversable[String], tags: Tags, iteratedCapts: Boolean = false): Valid[Result] =
     movesWithSans(moveStrs, identity, tags, iteratedCapts)
 
-  def fullWithSans(pdn: String, op: Sans => Sans, tags: Tags = Tags.empty, iteratedCapts: Boolean = false): Valid[Result] =
-    Parser.full(cleanUserInput(pdn)) map { parsed =>
-      makeReplay(makeGame(parsed.tags ++ tags), op(parsed.sans), iteratedCapts)
-    }
-
-  def fullWithSans(parsed: ParsedPdn, op: Sans => Sans): Result =
-    makeReplay(makeGame(parsed.tags), op(parsed.sans))
+  def fullWithSans(parsed: ParsedPdn, op: Sans => Sans, iteratedCapts: Boolean = false): Result =
+    makeReplay(makeGame(parsed.tags, parsed.initialPosition.some), op(parsed.sans), iteratedCapts)
 
   def movesWithSans(moveStrs: Traversable[String], op: Sans => Sans, tags: Tags, iteratedCapts: Boolean = false): Valid[Result] =
     Parser.moves(moveStrs, tags.variant | variant.Variant.default) map { moves =>
       makeReplay(makeGame(tags), op(moves), iteratedCapts)
     }
 
-  // remove invisible byte order mark
-  def cleanUserInput(str: String) = str.replace("""\ufeff""", "")
-
   private def makeReplay(game: DraughtsGame, sans: Sans, iteratedCapts: Boolean = false): Result = {
     def mk(replay: Replay, moves: List[San], ambs: List[(San, String)]): Result = {
       var newAmb = none[(San, String)]
       val res = moves match {
         case san :: rest =>
-          san(replay.state.situation, iteratedCapts, if (ambs.isEmpty) None else ambs.collect({ case (ambSan, ambUci) if ambSan == san => ambUci }).some).fold(
+          val ambiguities = if (ambs.isEmpty) none else ambs.collect({ case (ambSan, ambUci) if ambSan == san => ambUci }).some
+          san(replay.state.situation, iteratedCapts, ambiguities).fold(
             err => Result.Incomplete(replay, err),
             move => {
               if (iteratedCapts && move.capture.fold(false)(_.length > 1) && move.situationBefore.ambiguitiesMove(move) > ambs.length + 1)
                 newAmb = (san -> move.toUci.uci).some
-              mk(replay.addMove(move, iteratedCapts), rest, newAmb.fold(ambs)(_ :: ambs))
+              val fenComment = san.metas.fenComment(game.board.variant)
+              if (fenComment.isDefined && rest.nonEmpty) {
+                // restart at each fen comment
+                val g = DraughtsGame(
+                  variantOption = game.board.variant.some,
+                  fen = fenComment
+                )
+                val newReplay = Replay(g.copy(
+                  startedAtTurn = replay.state.turns,
+                  clock = game.clock
+                ))
+                newAmb = none
+                mk(newReplay, rest, Nil)
+              } else mk(replay.addMove(move, iteratedCapts), rest, newAmb.fold(ambs)(_ :: ambs))
             }
           )
         case _ => Result.Complete(replay)
@@ -63,10 +66,15 @@ object Reader {
     mk(Replay(game), sans.value, Nil)
   }
 
-  private def makeGame(tags: Tags) = {
+  private def makeGame(tags: Tags, maybeInit: Option[InitialPosition] = None): DraughtsGame = {
+    val fenComment = maybeInit match {
+      case Some(init) =>
+        init.initialFen(tags.variant | variant.Standard)
+      case _ => none
+    }
     val g = DraughtsGame(
       variantOption = tags.variant,
-      fen = tags(_.FEN)
+      fen = fenComment orElse tags(_.FEN)
     )
     g.copy(
       startedAtTurn = g.turns,
