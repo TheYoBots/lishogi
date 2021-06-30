@@ -69,7 +69,7 @@ final class PdnDump(
       Tag(_.Opening, opening.fold("?")(_.name)),
       Tag(_.Result, "*") // required for SCID to import
     ) ::: List(annotatorTag(study)) ::: (chapter.root.fen.value != Forsyth.initial).??(List(
-        Tag(_.FEN, chapter.root.fen.value)
+        Tag(_.FEN, Forsyth.shorten(chapter.root.fen.value))
       //Tag("SetUp", "1")
       ))
     genTags.foldLeft(chapter.tags.value.reverse) {
