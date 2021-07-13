@@ -241,56 +241,56 @@ Also all infos belonging to the pv should be sent together, e.g.
 ```
 	info depth 2 score cp 214 time 1242 nodes 2124 nps 34928 pv 2g2f 8c8d 2f2e
 ```
-    
-I suggest to start sending currmove, currmovenumber, currline and refutation only after one second in order to avoid too much traffic.
 
+I suggest to start sending currmove, currmovenumber, currline and refutation only after one second in order to avoid too much traffic. <br/> <br/>
 Additional info:
 
-    - `depth <x>` <br/>
+- `depth <x>` <br/>
 Search depth in plies.
-    - `seldepth <x>` <br/>
+- `seldepth <x>` <br/>
 Selective search depth in plies. If the engine sends seldepth there must also be a `depth` present in the same string.
-    - `time <x>` <br/>
+- `time <x>` <br/>
 The time searched in ms. This should be sent together with the pv.
-    - `nodes <x>` <br/>
+- `nodes <x>` <br/>
 x nodes searched. The engine should send this info regularly.
-    - `pv <move1> ... <movei>` <br/>
+- `pv <move1> ... <movei>` <br/>
 The best line found.
-    - `multipv <num>` <br/>
+- `multipv <num>` <br/>
 This for the multi pv mode. For the best move/pv add `multipv 1` in the string when you send the pv. In k-best mode, always send all k variants in k strings together.
-    - `score` <br/>
-`cp <x>` <br/>
-The score from the engine's point of view, in centipawns. <br/>
-`mate <y>` <br/>
-Mate in y plies. If the engine is getting mated, use negative values for y. <br/>
-`lowerbound` <br/>
-The score is just a lower bound. <br/>
-`upperbound` <br/>
+- `score`
+    - `cp <x>` <br/>
+The score from the engine's point of view, in centipawns.
+    - `mate <y>` <br/>
+Mate in y plies. If the engine is getting mated, use negative values for y.
+    - `lowerbound` <br/>
+The score is just a lower bound.
+    - `upperbound` <br/>
 The score is just an upper bound.
 
-    - `currmove <move>` <br/>
+- `currmove <move>` <br/>
 Currently searching this move.
-    - `currmovenumber <x>` <br/>
+- `currmovenumber <x>` <br/>
 Currently searching move number x, for the first move x should be 1, not 0.
-    - `hashfull <x>` <br/>
+- `hashfull <x>` <br/>
 The hash is x permill full. The engine should send this info regularly.
-    - `nps <x>` <br/>
+- `nps <x>` <br/>
 x nodes per second searched. the engine should send this info regularly.
-    - `cpuload <x>` <br/>
+- `cpuload <x>` <br/>
 The cpu usage of the engine is x permill.
-    - `string <str>` <br/>
+- `string <str>` <br/>
 Any string str which will be displayed be the engine. if there is a string command the rest of the line will be interpreted as `<str>`.
-    - `refutation <move1> <move2> ... <movei>` <br/>
+- `refutation <move1> <move2> ... <movei>` <br/>
 Move `<move1>` is refuted by the line `<move2>` ... `<movei>`, where i can be any number >= 1. Example: after move 8h2b+ is searched, the engine can send `info refutation 8h2b+ 1c2b` if 1c2b is the best answer after 8h2b+ or if 1c2b refutes the move 8h2b+. If there is no refutation for 8h2b+ found, the engine should just send `info refutation 8h2b+`. The engine should only send this if the option `USI_ShowRefutations` is set to true.
-    - `currline <cpunr> <move1> ... <movei>` <br/>
-This is the current line the engine is calculating. `<cpunr>` is the number of the cpu if the engine is running on more than one cpu. `<cpunr>` = 1,2,3.... If the engine is just using one cpu, `<cpunr>` can be omitted. If `<cpunr>` is greater than 1, always send all k lines in k strings together. The engine should only send this if the option `USI_ShowCurrLine` is set to true.
+- `currline <cpunr> <move1> ... <movei>` <br/>
+This is the current line the engine is calculating. `<cpunr>` is the number of the cpu if the engine is running on more than one cpu. `<cpunr>` = 1,2,3.... If the engine is just using one cpu, `<cpunr>` can be omitted. If `<cpunr>` is greater than 1, always send all k lines in k strings together. The engine should only send this if the option `USI_ShowCurrLine` is set to true. <br/> <br/> <br/>
+
 - `option` <br/>
 This command tells the GUI which parameters can be changed in the engine. This should be sent once at engine startup after the `usi` and the `id` commands if any parameter can be changed in the engine. The GUI should parse this and build a dialog for the user to change the settings. Note that not every option should appear in this dialog, as some options like `USI_Ponder`, `USI_AnalyseMode`, etc. are better handled elsewhere or are set automatically. <br/> <br/>
 If the user wants to change some settings, the GUI will send a setoption command to the engine. <br/> <br/>
 Note that the GUI need not send the setoption command when starting the engine for every option if it doesn't want to change the default value. For all allowed combinations see the examples below, as some combinations of this tokens don't make sense. <br/> <br/>
 One string will be sent for each parameter.
 
-    - `name <id>`
+    - `name <id>` <br/>
 The option has the name `<id>`. Whitespace is not allowed in an option name. Note that the name should normally not be displayed directly in the GUI: The GUI should look up the option name in the translation file, and present the translation into the users preferred language in the engine's option dialog. <br/> <br/>
 Certain options have a fixed value for `<id>`, which means that the semantics of this option is fixed. Usually those options should not be displayed in the normal engine options window of the GUI but get a special treatment. `USI_Pondering` for example should be set automatically when pondering is enabled or disabled in the GUI options. The same for `USI_AnalyseMode` which should also be set automatically by the GUI. All those certain options have the prefix `USI_`. If the GUI gets an unknown option with the prefix `USI_`, it should just ignore it and not display it in the engine's options dialog. <br/> <br/>
 The options with fixed semantics are: <br/> <br/>
