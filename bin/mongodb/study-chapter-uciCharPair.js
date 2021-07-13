@@ -1,6 +1,6 @@
 coll = db.study_chapter_flat
 
-function newUciCharPair(str){
+function newUsiCharPair(str){
   var last = str.substr(str.length - 1);
   return str.slice(0, -1) + last.replace("v", "õ").replace("u", "ô")
     .replace("t", "ó").replace("w", "ö")
@@ -45,7 +45,7 @@ function fixDrops(id, root) {
       for(var dropNode of descDrops){
         // We always check whether current node, doesn't start with node ending with a drop
         if(node.startsWith(dropNode)){
-          newNode = newNode.replace(dropNode, newUciCharPair(dropNode))
+          newNode = newNode.replace(dropNode, newUsiCharPair(dropNode))
         }
       }
 
@@ -56,7 +56,7 @@ function fixDrops(id, root) {
         for(var os of root[node].o){
           if(descDrops.includes(node + os)){
             changedVars = true
-            vars.push(newUciCharPair(os))
+            vars.push(newUsiCharPair(os))
           }
           else vars.push(os)
         }
