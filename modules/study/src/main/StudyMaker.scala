@@ -1,14 +1,14 @@
-package lila.study
+package lishogi.study
 
 import shogi.format.FEN
-import lila.game.{ Namer, Pov }
-import lila.user.User
+import lishogi.game.{ Namer, Pov }
+import lishogi.user.User
 
 final private class StudyMaker(
-    lightUserApi: lila.user.LightUserApi,
-    gameRepo: lila.game.GameRepo,
+    lightUserApi: lishogi.user.LightUserApi,
+    gameRepo: lishogi.game.GameRepo,
     chapterMaker: ChapterMaker,
-    pgnDump: lila.game.PgnDump
+    pgnDump: lishogi.game.PgnDump
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
   def apply(data: StudyMaker.ImportGame, user: User): Fu[Study.WithChapter] =

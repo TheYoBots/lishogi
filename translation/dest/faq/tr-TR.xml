@@ -7,7 +7,7 @@
 	<string name="lishogiCombinationLiveLightLibrePronounced">Çünkü bu site Lichess\'ten türetilmiştir ve lichess, lichess diye okunur çünkü canlı/hafif/yaşam ve satranç kelimelerinin birleşimidir (live/light/libre/chess). Lishogi, %1$s olarak telaffuz edilir.</string>
 	<string name="leechess">Lishogi</string>
 	<string name="whyLiveLightLibre">Canlı, çünkü oyunlar gerçek zamanlı olarak 24/7 oynanır ve izlenir; bunun nedeni Lishogi açık kaynak kodludur ve diğer web sitelerini rahatsız eden önemsiz sıkıntılar tarafından engellenmemesi içindir.</string>
-	<string name="whyIsLilaCalledLila">Benzer şekilde, Lishogi\'nin kaynak kodu %1$s\'dur. Zira Lishogi\'nin büyük bir bölümü sezgisel bir programlama dili olan %2$s ile yazılmıştır.</string>
+	<string name="whyIslishogiCalledlishogi">Benzer şekilde, Lishogi\'nin kaynak kodu %1$s\'dur. Zira Lishogi\'nin büyük bir bölümü sezgisel bir programlama dili olan %2$s ile yazılmıştır.</string>
 	<string name="howCanIContributeToLishogi">Lishogi\'ye nasıl katkıda bulunabilirim?</string>
 	<string name="lishogiPoweredByDonationsAndVolunteers">Lishogi, sizlerin bağışları ve gönüllülerden oluşan bir ekibin gayretleriyle ayakta kalmaktadır.</string>
 	<string name="findMoreAndSeeHowHelp">%1$s hakkında daha fazla bilgi edinebilirsiniz. Lishogi\'ye zamanınızı ve becerilerinizi gönüllü olarak göstererek yardım etmek istiyorsanız, birçok %2$s var.</string>

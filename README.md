@@ -2,7 +2,7 @@
 
 ![Lishogi homepage-Lishogi comes with light and dark theme, this screenshot shows dark.](https://user-images.githubusercontent.com/73843275/116246246-6e6d1c00-a787-11eb-9d64-cd1de919b162.png)
 
-Lila (li[shogi in sca]la) is a free online shogi game server focused on realtime gameplay and ease of use.
+lishogi (li[shogi in sca]la) is a free online shogi game server focused on realtime gameplay and ease of use.
 
 It features a [computer analysis](https://lishogi.org/analysis),
 [tournaments](https://lishogi.org/tournament),
@@ -17,7 +17,7 @@ and relies on the [Play 2.8](https://www.playframework.com/) framework.
 [scalatags](http://www.lihaoyi.com/scalatags/) is used for templating.
 Pure chess logic is contained in the [scalashogi](https://github.com/WandererXII/scalashogi) submodule.
 The server is fully asynchronous, making heavy use of Scala Futures and [Akka streams](http://akka.io).
-WebSocket connections are handled by a [separate server](https://github.com/ornicar/lila-ws) that communicates using [redis](https://redis.io/).
+WebSocket connections are handled by a [separate server](https://github.com/ornicar/lishogi-ws) that communicates using [redis](https://redis.io/).
 It uses [MongoDB](https://mongodb.org) to store games.
 HTTP requests and WebSocket connections can be proxied by [nginx](http://nginx.org).
 The web client is written in [TypeScript](https://www.typescriptlang.org/) and [snabbdom](https://github.com/snabbdom/snabbdom), using [Sass](https://sass-lang.com/) to generate CSS.
@@ -27,7 +27,7 @@ Use [GitHub issues](https://github.com/WandererXII/lishogi/issues) for bug repor
 
 ## Credits
 
-This code exists because of [ornicar](https://github.com/ornicar), and the whole [Lichess project](https://github.com/ornicar/lila)
+This code exists because of [ornicar](https://github.com/ornicar), and the whole [Lichess project](https://github.com/ornicar/lishogi)
 
 ## Supported browsers
 
@@ -44,6 +44,6 @@ For your own sake, please upgrade. Security and performance, think about it!
 
 ## License
 
-Lila is licensed under the GNU Affero General Public License 3 or any later
+lishogi is licensed under the GNU Affero General Public License 3 or any later
 version at your choice with an exception for Highcharts. See COPYING for
 details. WIP

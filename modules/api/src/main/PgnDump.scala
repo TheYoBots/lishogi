@@ -1,21 +1,21 @@
-package lila.api
+package lishogi.api
 
 import shogi.format.FEN
 import shogi.format.pgn.Pgn
-import lila.analyse.{ Analysis, Annotator }
-import lila.game.Game
-import lila.game.PgnDump.WithFlags
-import lila.team.GameTeams
+import lishogi.analyse.{ Analysis, Annotator }
+import lishogi.game.Game
+import lishogi.game.PgnDump.WithFlags
+import lishogi.team.GameTeams
 
 final class PgnDump(
-    val dumper: lila.game.PgnDump,
+    val dumper: lishogi.game.PgnDump,
     annotator: Annotator,
-    simulApi: lila.simul.SimulApi,
-    getTournamentName: lila.tournament.GetTourName,
-    getSwissName: lila.swiss.GetSwissName
+    simulApi: lishogi.simul.SimulApi,
+    getTournamentName: lishogi.tournament.GetTourName,
+    getSwissName: lishogi.swiss.GetSwissName
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  implicit private val lang = lila.i18n.defaultLang
+  implicit private val lang = lishogi.i18n.defaultLang
 
   def apply(
       game: Game,
@@ -29,7 +29,7 @@ final class PgnDump(
       if (flags.tags) (game.simulId ?? simulApi.idToName) map { simulName =>
         simulName
           .orElse(game.tournamentId flatMap getTournamentName.get)
-          .orElse(game.swissId map lila.swiss.Swiss.Id flatMap getSwissName.apply)
+          .orElse(game.swissId map lishogi.swiss.Swiss.Id flatMap getSwissName.apply)
           .fold(pgn)(pgn.withEvent)
       }
       else fuccess(pgn)

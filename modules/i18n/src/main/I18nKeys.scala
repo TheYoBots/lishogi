@@ -1,5 +1,5 @@
 // Generated with bin/trans-dump.js
-package lila.i18n
+package lishogi.i18n
 
 // format: OFF
 object I18nKeys {
@@ -1707,7 +1707,7 @@ val `forkedFromLichess` = new I18nKey("faq:forkedFromLichess")
 val `lishogiCombinationLiveLightLibrePronounced` = new I18nKey("faq:lishogiCombinationLiveLightLibrePronounced")
 val `leechess` = new I18nKey("faq:leechess")
 val `whyLiveLightLibre` = new I18nKey("faq:whyLiveLightLibre")
-val `whyIsLilaCalledLila` = new I18nKey("faq:whyIsLilaCalledLila")
+val `whyIslishogiCalledlishogi` = new I18nKey("faq:whyIslishogiCalledlishogi")
 val `howCanIContributeToLishogi` = new I18nKey("faq:howCanIContributeToLishogi")
 val `lishogiPoweredByDonationsAndVolunteers` = new I18nKey("faq:lishogiPoweredByDonationsAndVolunteers")
 val `findMoreAndSeeHowHelp` = new I18nKey("faq:findMoreAndSeeHowHelp")

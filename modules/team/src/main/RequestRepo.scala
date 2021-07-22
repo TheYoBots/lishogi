@@ -1,6 +1,6 @@
-package lila.team
+package lishogi.team
 
-import lila.db.dsl._
+import lishogi.db.dsl._
 
 final class RequestRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionContext) {
 
@@ -27,7 +27,7 @@ final class RequestRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionC
   def teamQuery(teamId: ID)            = $doc("team" -> teamId)
   def teamsQuery(teamIds: List[ID])    = $doc("team" $in teamIds)
 
-  def getByUserId(userId: lila.user.User.ID) =
+  def getByUserId(userId: lishogi.user.User.ID) =
     coll.list[Request]($doc("user" -> userId))
 
   def remove(id: ID) = coll.delete.one($id(id))

@@ -1,17 +1,17 @@
-package lila.study
+package lishogi.study
 
 import akka.stream.scaladsl._
 import shogi.format.pgn.{ Glyphs, Initial, Pgn, Tag, Tags }
 import shogi.format.{ Forsyth, pgn => shogiPgn }
 import org.joda.time.format.DateTimeFormat
 
-import lila.common.String.slugify
-import lila.tree.Node.{ Shape, Shapes }
+import lishogi.common.String.slugify
+import lishogi.tree.Node.{ Shape, Shapes }
 
 final class PgnDump(
     chapterRepo: ChapterRepo,
-    lightUserApi: lila.user.LightUserApi,
-    net: lila.common.config.NetConfig
+    lightUserApi: lishogi.user.LightUserApi,
+    net: lishogi.common.config.NetConfig
 ) {
 
   import PgnDump._

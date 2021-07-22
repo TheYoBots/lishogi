@@ -1,20 +1,20 @@
-package lila.study
+package lishogi.study
 
 import shogi.format.pgn.Tags
 import shogi.Hands
 import shogi.format.{ FEN, Forsyth }
 import shogi.variant.Variant
-import lila.chat.{ Chat, ChatApi }
-import lila.game.{ Game, Namer }
-import lila.user.User
+import lishogi.chat.{ Chat, ChatApi }
+import lishogi.game.{ Game, Namer }
+import lishogi.user.User
 
 final private class ChapterMaker(
-    net: lila.common.config.NetConfig,
-    lightUser: lila.user.LightUserApi,
+    net: lishogi.common.config.NetConfig,
+    lightUser: lishogi.user.LightUserApi,
     chatApi: ChatApi,
-    gameRepo: lila.game.GameRepo,
+    gameRepo: lishogi.game.GameRepo,
     pgnFetch: PgnFetch,
-    pgnDump: lila.game.PgnDump
+    pgnDump: lishogi.game.PgnDump
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
   import ChapterMaker._
@@ -181,7 +181,7 @@ final private class ChapterMaker(
 
 private[study] object ChapterMaker {
 
-  case class ValidationException(message: String) extends lila.base.LilaException
+  case class ValidationException(message: String) extends lishogi.base.lishogiException
 
   sealed trait Mode {
     def key = toString.toLowerCase

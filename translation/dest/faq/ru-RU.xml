@@ -7,7 +7,7 @@
 	<string name="lishogiCombinationLiveLightLibrePronounced">Потому что название происходит от Liсhess. А Liсhess называется так, потому что это комбинация live/light/libre и шахмат. Lishogi произносится как %1$s.</string>
 	<string name="leechess">ли-сёги</string>
 	<string name="whyLiveLightLibre">Живые, потому что можно играть партии и смотреть игры в реальном времени 24/7. Легковесные и свободные, потому что разрабатываются на принципах свободного программного обеспечения и не завалены проприетарным хламом, как коммерческие проекты.</string>
-	<string name="whyIsLilaCalledLila">То же относится к исходному коду Lishogi, %1$s, что означает li[shogi in sca]la, основная часть Lishogi написана на %2$s, интуитивно понятном языке программирования.</string>
+	<string name="whyIslishogiCalledlishogi">То же относится к исходному коду Lishogi, %1$s, что означает li[shogi in sca]la, основная часть Lishogi написана на %2$s, интуитивно понятном языке программирования.</string>
 	<string name="howCanIContributeToLishogi">Как я могу внести свой вклад в Lishogi?</string>
 	<string name="lishogiPoweredByDonationsAndVolunteers">Lishogi существует на пожертвования игроков и разрабатывается командой волонтёров.</string>
 	<string name="findMoreAndSeeHowHelp">Вы можете узнать больше о %1$s. Если вы хотите помочь Lichess, пожертвовав свои знания и время, есть %2$s.</string>

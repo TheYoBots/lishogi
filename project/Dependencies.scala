@@ -7,9 +7,9 @@ object Dependencies {
 
     val sonatype  = Resolver.sonatypeRepo("releases")
     val sonatypeS = Resolver.sonatypeRepo("snapshots")
-    val lilaMaven = "lila-maven" at "https://raw.githubusercontent.com/ornicar/lila-maven/master"
+    val lishogiMaven = "lishogi-maven" at "https://raw.githubusercontent.com/ornicar/lishogi-maven/master"
 
-    val commons = Seq(sonatype, lilaMaven, sonatypeS)
+    val commons = Seq(sonatype, lishogiMaven, sonatypeS)
   }
 
   val scalaz      = "org.scalaz"           %% "scalaz-core"                     % "7.2.30"

@@ -6,11 +6,11 @@ import play.api.libs.json.Json
 import play.utils.UriEncoding
 
 import bits.dataPanel
-import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
-import lila.common.String.html.safeJsonValue
-import lila.game.Pov
+import lishogi.api.Context
+import lishogi.app.templating.Environment._
+import lishogi.app.ui.ScalatagsTemplate._
+import lishogi.common.String.html.safeJsonValue
+import lishogi.game.Pov
 
 import controllers.routes
 
@@ -25,12 +25,12 @@ object replay {
       data: play.api.libs.json.JsObject,
       initialFen: Option[shogi.format.FEN],
       kifu: String,
-      analysis: Option[lila.analyse.Analysis],
+      analysis: Option[lishogi.analyse.Analysis],
       analysisStarted: Boolean,
-      simul: Option[lila.simul.Simul],
-      cross: Option[lila.game.Crosstable.WithMatchup],
-      userTv: Option[lila.user.User],
-      chatOption: Option[lila.chat.UserChat.Mine],
+      simul: Option[lishogi.simul.Simul],
+      cross: Option[lishogi.game.Crosstable.WithMatchup],
+      userTv: Option[lishogi.user.User],
+      chatOption: Option[lishogi.chat.UserChat.Mine],
       bookmarked: Boolean
   )(implicit ctx: Context) = {
 
@@ -43,7 +43,7 @@ object replay {
         timeout = c.timeout,
         withNoteAge = ctx.isAuth option game.secondsSinceCreation,
         public = true,
-        resourceId = lila.chat.Chat.ResourceId(s"game/${c.chat.id}"),
+        resourceId = lishogi.chat.Chat.ResourceId(s"game/${c.chat.id}"),
         palantir = ctx.me.exists(_.canPalantir)
       )
     }

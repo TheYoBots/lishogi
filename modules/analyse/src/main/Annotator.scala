@@ -1,10 +1,10 @@
-package lila.analyse
+package lishogi.analyse
 
 import shogi.format.pgn.{ Glyphs, Move, Pgn, Tag, Turn }
 import shogi.opening._
 import shogi.{ Color, Status }
 
-final class Annotator(netDomain: lila.common.config.NetDomain) {
+final class Annotator(netDomain: lishogi.common.config.NetDomain) {
 
   def apply(
       p: Pgn,
@@ -22,7 +22,7 @@ final class Annotator(netDomain: lila.common.config.NetDomain) {
     }
 
   private def annotateStatus(winner: Option[Color], status: Status)(p: Pgn) =
-    lila.game.StatusText(status, winner, shogi.variant.Standard) match {
+    lishogi.game.StatusText(status, winner, shogi.variant.Standard) match {
       case ""   => p
       case text => p.updateLastPly(_.copy(result = text.some))
     }

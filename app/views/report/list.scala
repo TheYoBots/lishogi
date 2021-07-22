@@ -1,18 +1,18 @@
 package views.html.report
 
-import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
-import lila.report.Report.WithSuspect
+import lishogi.api.Context
+import lishogi.app.templating.Environment._
+import lishogi.app.ui.ScalatagsTemplate._
+import lishogi.report.Report.WithSuspect
 
 import controllers.routes
 
 object list {
 
   def apply(
-      reports: List[lila.report.Report.WithSuspect],
+      reports: List[lishogi.report.Report.WithSuspect],
       filter: String,
-      counts: lila.report.Room.Counts,
+      counts: lishogi.report.Room.Counts,
       streamers: Int
   )(implicit ctx: Context) =
     views.html.base.layout(
@@ -32,7 +32,7 @@ object list {
                 countTag(counts.sum > 0 option counts.sum),
                 "All"
               ),
-              lila.report.Room.all.map { room =>
+              lishogi.report.Room.all.map { room =>
                 a(
                   href := routes.Report.listWithFilter(room.key),
                   cls := List(

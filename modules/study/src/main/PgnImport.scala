@@ -1,12 +1,12 @@
-package lila.study
+package lishogi.study
 
 import shogi.format.pgn.{ Dumper, Glyphs, ParsedPgn, San, Tags }
 import shogi.format.{ FEN, Forsyth, Uci, UciCharPair }
 
 import shogi.Centis
-import lila.common.LightUser
-import lila.importer.{ ImportData, Preprocessed }
-import lila.tree.Node.{ Comment, Comments, Shapes }
+import lishogi.common.LightUser
+import lishogi.importer.{ ImportData, Preprocessed }
+import lishogi.tree.Node.{ Comment, Comments, Shapes }
 
 object PgnImport {
 
@@ -53,7 +53,7 @@ object PgnImport {
                 status = status,
                 winner = game.winnerColor,
                 resultText = shogi.Color.showResult(game.winnerColor),
-                statusText = lila.game.StatusText(status, game.winnerColor, game.variant)
+                statusText = lishogi.game.StatusText(status, game.winnerColor, game.variant)
               )
             }
             val commented =
@@ -82,7 +82,7 @@ object PgnImport {
     }
 
   private def endComment(end: End): Comment = {
-    import lila.tree.Node.Comment
+    import lishogi.tree.Node.Comment
     import end._
     val text = s"$resultText $statusText"
     Comment(Comment.Id.make, Comment.Text(text), Comment.Author.Lishogi)

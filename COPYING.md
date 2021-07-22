@@ -1,18 +1,18 @@
-Copying Lila
+Copying lishogi
 ============
 
 Any file in this project that does not state otherwise and is not listed as an
-exception below is part of lila and copyright (c) 2012-2019 the lila authors.
+exception below is part of lishogi and copyright (c) 2012-2019 the lishogi authors.
 
 For a list of the authors see the commit log or
-https://github.com/ornicar/lila/graphs/contributors.
+https://github.com/ornicar/lishogi/graphs/contributors.
 
-Lila is free software; you can redistribute and/or modify it under the terms
+lishogi is free software; you can redistribute and/or modify it under the terms
 of the GNU Affero General Public License as published by the Free Software
 Foundation; either version 3 of the License, or (at your option) any later
 version.
 
-Lila is distributed in the hope that it will be useful, but WITHOUT ANY
+lishogi is distributed in the hope that it will be useful, but WITHOUT ANY
 WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
 details.
@@ -43,7 +43,7 @@ public/images/staunton | [James Clarke](https://github.com/clarkerubber/Staunton
 public/images/staunton/piece/CubesAndPi | CubesAndPi | AGPLv3+
 public/images/trophy | [James Clarke](https://github.com/clarkerubber/Staunton-Pieces/tree/master/Trophies) | [MIT](https://github.com/clarkerubber/Staunton-Pieces/blob/master/LICENSE)
 public/images/flags | [Go Squared Ltd.](https://www.gosquared.com/resources/flag-icons/) | [MIT](https://github.com/gosquared/flags/blob/master/LICENSE.txt)
-public/images/boards | the lila authors and [pirouetti](https://lichess.org/@/pirouetti) | AGPLv3+
+public/images/boards | the lishogi authors and [pirouetti](https://lichess.org/@/pirouetti) | AGPLv3+
 public/images/learn/pieces | Thibault Duplessis and [Colin M.L. Burnett](https://en.wikipedia.org/wiki/User:Cburnett) | [GPLv2+](https://www.gnu.org/licenses/gpl-2.0.txt)
 public/piece/mono | Thibault Duplessis and [Colin M.L. Burnett](https://en.wikipedia.org/wiki/User:Cburnett) | [GPLv2+](https://www.gnu.org/licenses/gpl-2.0.txt)
 public/piece/cburnett | [Colin M.L. Burnett](https://en.wikipedia.org/wiki/User:Cburnett) | [GPLv2+](https://www.gnu.org/licenses/gpl-2.0.txt)

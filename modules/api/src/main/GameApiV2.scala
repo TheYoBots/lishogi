@@ -1,4 +1,4 @@
-package lila.api
+package lishogi.api
 
 import akka.stream.scaladsl._
 import org.joda.time.DateTime
@@ -7,26 +7,26 @@ import scala.concurrent.duration._
 
 import shogi.format.FEN
 import shogi.format.pgn.Tag
-import lila.analyse.{ JsonView => analysisJson, Analysis }
-import lila.common.config.MaxPerSecond
-import lila.common.Json.jodaWrites
-import lila.common.{ HTTPRequest, LightUser }
-import lila.db.dsl._
-import lila.team.GameTeams
-import lila.game.JsonView._
-import lila.game.PgnDump.WithFlags
-import lila.game.{ Game, PerfPicker, Query }
-import lila.tournament.Tournament
-import lila.user.User
+import lishogi.analyse.{ JsonView => analysisJson, Analysis }
+import lishogi.common.config.MaxPerSecond
+import lishogi.common.Json.jodaWrites
+import lishogi.common.{ HTTPRequest, LightUser }
+import lishogi.db.dsl._
+import lishogi.team.GameTeams
+import lishogi.game.JsonView._
+import lishogi.game.PgnDump.WithFlags
+import lishogi.game.{ Game, PerfPicker, Query }
+import lishogi.tournament.Tournament
+import lishogi.user.User
 
 final class GameApiV2(
     pgnDump: PgnDump,
-    gameRepo: lila.game.GameRepo,
-    tournamentRepo: lila.tournament.TournamentRepo,
-    pairingRepo: lila.tournament.PairingRepo,
-    playerRepo: lila.tournament.PlayerRepo,
-    swissApi: lila.swiss.SwissApi,
-    analysisRepo: lila.analyse.AnalysisRepo,
+    gameRepo: lishogi.game.GameRepo,
+    tournamentRepo: lishogi.tournament.TournamentRepo,
+    pairingRepo: lishogi.tournament.PairingRepo,
+    playerRepo: lishogi.tournament.PlayerRepo,
+    swissApi: lishogi.swiss.SwissApi,
+    analysisRepo: lishogi.analyse.AnalysisRepo,
     getLightUser: LightUser.Getter,
     realPlayerApi: RealPlayerApi
 )(implicit
@@ -85,17 +85,17 @@ final class GameApiV2(
       "lishogi_tournament_%s_%s_%s.%s".format(
         Tag.UTCDate.format.print(tour.startsAt),
         tour.id,
-        lila.common.String.slugify(tour.name),
+        lishogi.common.String.slugify(tour.name),
         format.toString.toLowerCase
       ),
       "_"
     )
-  def filename(swiss: lila.swiss.Swiss, format: Format): String =
+  def filename(swiss: lishogi.swiss.Swiss, format: Format): String =
     fileR.replaceAllIn(
       "lishogi_swiss_%s_%s_%s.%s".format(
         Tag.UTCDate.format.print(swiss.startsAt),
         swiss.id,
-        lila.common.String.slugify(swiss.name),
+        lishogi.common.String.slugify(swiss.name),
         format.toString.toLowerCase
       ),
       "_"
@@ -338,7 +338,7 @@ object GameApiV2 {
       until: Option[DateTime] = None,
       max: Option[Int] = None,
       rated: Option[Boolean] = None,
-      perfType: Set[lila.rating.PerfType],
+      perfType: Set[lishogi.rating.PerfType],
       analysed: Option[Boolean] = None,
       ongoing: Boolean = false,
       color: Option[shogi.Color],
@@ -370,7 +370,7 @@ object GameApiV2 {
   ) extends Config
 
   case class BySwissConfig(
-      swissId: lila.swiss.Swiss.Id,
+      swissId: lishogi.swiss.Swiss.Id,
       format: Format,
       flags: WithFlags,
       perSecond: MaxPerSecond

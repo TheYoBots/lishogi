@@ -1,4 +1,4 @@
-package lila.studySearch
+package lishogi.studySearch
 
 import akka.actor._
 import akka.stream.scaladsl._
@@ -8,10 +8,10 @@ import play.api.libs.json._
 import scala.concurrent.duration._
 
 import shogi.format.pgn.Tag
-import lila.hub.LateMultiThrottler
-import lila.search._
-import lila.study.{ Chapter, ChapterRepo, RootOrNode, Study, StudyRepo }
-import lila.tree.Node.Comments
+import lishogi.hub.LateMultiThrottler
+import lishogi.search._
+import lishogi.study.{ Chapter, ChapterRepo, RootOrNode, Study, StudyRepo }
+import lishogi.tree.Node.Comments
 
 final class StudySearchApi(
     client: ESClient,
@@ -121,7 +121,7 @@ final class StudySearchApi(
           }
           logger.info(s"Index to ${c.index.name} since $since")
           val retryLogger = logger.branch("index")
-          import lila.db.dsl._
+          import lishogi.db.dsl._
           Source
             .futureSource {
               studyRepo
@@ -131,9 +131,9 @@ final class StudySearchApi(
                 )
                 .map(_.documentSource())
             }
-            .via(lila.common.LilaStream.logRate[Study]("study index")(logger))
+            .via(lishogi.common.lishogiStream.logRate[Study]("study index")(logger))
             .mapAsyncUnordered(8) { study =>
-              lila.common.Future.retry(() => doStore(study), 5 seconds, 10, retryLogger.some)
+              lishogi.common.Future.retry(() => doStore(study), 5 seconds, 10, retryLogger.some)
             }
             .toMat(Sink.ignore)(Keep.right)
             .run()

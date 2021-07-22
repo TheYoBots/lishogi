@@ -1,9 +1,9 @@
 package views.html
 package game
 
-import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lishogi.api.Context
+import lishogi.app.templating.Environment._
+import lishogi.app.ui.ScalatagsTemplate._
 
 import controllers.routes
 
@@ -17,7 +17,7 @@ object importGame {
       title = trans.importGame.txt(),
       moreCss = cssTag("importer"),
       moreJs = jsTag("importer.js"),
-      openGraph = lila.app.ui
+      openGraph = lishogi.app.ui
         .OpenGraph(
           title = "Paste PGN chess game",
           url = s"$netBaseUrl${routes.Importer.importGame().url}",
@@ -31,7 +31,7 @@ object importGame {
         postForm(cls := "form3 import", action := routes.Importer.sendGame())(
           form3.group(form("pgn"), trans.pasteThePgnStringHere())(form3.textarea(_)()),
           form("pgn").value flatMap { pgn =>
-            lila.importer
+            lishogi.importer
               .ImportData(pgn, none)
               .preprocess(none)
               .fold(

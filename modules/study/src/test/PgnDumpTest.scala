@@ -1,4 +1,4 @@
-package lila.study
+package lishogi.study
 
 import shogi.format.pgn._
 import shogi.format.{ FEN, Uci, UciCharPair }

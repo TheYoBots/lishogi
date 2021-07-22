@@ -1,4 +1,4 @@
-package lila.importer
+package lishogi.importer
 
 import shogi.format.pgn.{ ParsedPgn, Parser, Reader, Tag, TagType, Tags }
 import shogi.format.{ FEN, Forsyth }
@@ -8,7 +8,7 @@ import play.api.data.Forms._
 import scala.util.chaining._
 import scalaz.Validation.FlatMap._
 
-import lila.game._
+import lishogi.game._
 
 final class DataForm {
 

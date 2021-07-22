@@ -1,7 +1,7 @@
-package lila.game
+package lishogi.game
 
 import java.security.MessageDigest
-import lila.db.ByteArray
+import lishogi.db.ByteArray
 
 private[game] case class Metadata(
     source: Option[Source],

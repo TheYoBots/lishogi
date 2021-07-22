@@ -1,16 +1,16 @@
-package lila.game
+package lishogi.game
 
 import shogi.format.Forsyth
 import shogi.format.pgn.{ ParsedPgn, Parser, Pgn, Tag, TagType, Tags }
 import shogi.format.{ FEN, pgn => shogiPgn }
 import shogi.{ Centis, Color }
 
-import lila.common.config.BaseUrl
-import lila.common.LightUser
+import lishogi.common.config.BaseUrl
+import lishogi.common.LightUser
 
 final class PgnDump(
     baseUrl: BaseUrl,
-    lightUserApi: lila.user.LightUserApi
+    lightUserApi: lishogi.user.LightUserApi
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
   import PgnDump._
@@ -55,13 +55,13 @@ final class PgnDump(
   private def rating(p: Player) = p.rating.fold("?")(_.toString)
 
   def player(p: Player, u: Option[LightUser]) =
-    p.aiLevel.fold(u.fold(p.name | lila.user.User.anonymous)(_.name))("lishogi AI level " + _)
+    p.aiLevel.fold(u.fold(p.name | lishogi.user.User.anonymous)(_.name))("lishogi AI level " + _)
 
   private val customStartPosition: Set[shogi.variant.Variant] =
     Set(shogi.variant.FromPosition)
 
   private def eventOf(game: Game) = {
-    val perf = game.perfType.fold("Standard")(_.trans(lila.i18n.defaultLang))
+    val perf = game.perfType.fold("Standard")(_.trans(lishogi.i18n.defaultLang))
     game.tournamentId.map { id =>
       s"${game.mode} $perf tournament https://lishogi.org/tournament/$id"
     } orElse game.simulId.map { id =>

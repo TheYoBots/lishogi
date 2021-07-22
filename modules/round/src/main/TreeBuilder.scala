@@ -1,4 +1,4 @@
-package lila.round
+package lishogi.round
 
 import shogi.Centis
 import shogi.format.pgn.Glyphs
@@ -6,8 +6,8 @@ import shogi.format.{ FEN, Forsyth, Uci, UciCharPair }
 import shogi.opening._
 import shogi.variant.Variant
 import JsonView.WithFlags
-import lila.analyse.{ Advice, Analysis, Info }
-import lila.tree._
+import lishogi.analyse.{ Advice, Analysis, Info }
+import lishogi.tree._
 
 object TreeBuilder {
 
@@ -22,7 +22,7 @@ object TreeBuilder {
     )
 
   def apply(
-      game: lila.game.Game,
+      game: lishogi.game.Game,
       analysis: Option[Analysis],
       initialFen: FEN,
       withFlags: WithFlags

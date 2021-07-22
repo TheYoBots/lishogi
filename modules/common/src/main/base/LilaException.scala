@@ -1,22 +1,22 @@
-package lila.base
+package lishogi.base
 
 import ornicar.scalalib.ValidTypes._
 
-trait LilaException extends Exception {
+trait lishogiException extends Exception {
   val message: String
 
   override def getMessage = message
   override def toString   = message
 }
 
-case class LilaInvalid(message: String) extends LilaException
+case class lishogiInvalid(message: String) extends lishogiException
 
-object LilaException extends scalaz.syntax.ToShowOps {
+object lishogiException extends scalaz.syntax.ToShowOps {
 
   def apply(msg: String) =
-    new LilaException {
+    new lishogiException {
       val message = msg
     }
 
-  def apply(msg: Failures): LilaException = apply(msg.shows)
+  def apply(msg: Failures): lishogiException = apply(msg.shows)
 }

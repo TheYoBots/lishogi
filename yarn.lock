@@ -4038,8 +4038,8 @@ minizlib@^2.1.1:
     minipass "^3.0.0"
     yallist "^4.0.0"
 
-"mithril@github:ornicar/mithril.js#lila-1":
-  version "0.2.1-lila"
+"mithril@github:ornicar/mithril.js#lishogi-1":
+  version "0.2.1-lishogi"
   resolved "https://codeload.github.com/ornicar/mithril.js/tar.gz/dd92827aec63f921149ca9a3460ccd981e7025bb"
 
 mixin-deep@^1.2.0:

@@ -1,19 +1,19 @@
-package lila.evalCache
+package lishogi.evalCache
 
 import com.softwaremill.macwire._
 import play.api.Configuration
 
-import lila.common.Bus
-import lila.common.config.CollName
-import lila.hub.actorApi.socket.remote.{ TellSriIn, TellSriOut }
-import lila.socket.Socket.Sri
+import lishogi.common.Bus
+import lishogi.common.config.CollName
+import lishogi.hub.actorApi.socket.remote.{ TellSriIn, TellSriOut }
+import lishogi.socket.Socket.Sri
 
 @Module
 final class Env(
     appConfig: Configuration,
-    userRepo: lila.user.UserRepo,
-    db: lila.db.Db,
-    cacheApi: lila.memo.CacheApi,
+    userRepo: lishogi.user.UserRepo,
+    db: lishogi.db.Db,
+    cacheApi: lishogi.memo.CacheApi,
     scheduler: akka.actor.Scheduler
 )(implicit
     ec: scala.concurrent.ExecutionContext,
@@ -33,7 +33,7 @@ final class Env(
   // remote socket support
   Bus.subscribeFun("remoteSocketIn:evalGet") { case TellSriIn(sri, _, msg) =>
     msg obj "d" foreach { d =>
-      // TODO send once, let lila-ws distribute
+      // TODO send once, let lishogi-ws distribute
       socketHandler.evalGet(Sri(sri), d, res => Bus.publish(TellSriOut(sri, res), "remoteSocketOut"))
     }
   }
@@ -45,7 +45,7 @@ final class Env(
   // END remote socket support
 
   def cli =
-    new lila.common.Cli {
+    new lishogi.common.Cli {
       def process = { case "eval-cache" :: "drop" :: fenParts =>
         api.drop(shogi.variant.Standard, shogi.format.FEN(fenParts mkString " ")) inject "done!"
       }

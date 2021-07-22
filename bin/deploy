@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-"""Deploy lila server and assets from GitHub workflow runs"""
+"""Deploy lishogi server and assets from GitHub workflow runs"""
 
 import argparse
 import sys
@@ -50,14 +50,14 @@ SERVER_FILES = [
     "project",
     "translation",
     "build.sbt",
-    "lila",
+    "lishogi",
     "conf/application.conf.default",
     ".sbtopts.default",
 ]
 
-ASSETS_BUILD_URL = "https://api.github.com/repos/ornicar/lila/actions/workflows/assets.yml/runs"
+ASSETS_BUILD_URL = "https://api.github.com/repos/ornicar/lishogi/actions/workflows/assets.yml/runs"
 
-SERVER_BUILD_URL = "https://api.github.com/repos/ornicar/lila/actions/workflows/server.yml/runs"
+SERVER_BUILD_URL = "https://api.github.com/repos/ornicar/lishogi/actions/workflows/server.yml/runs"
 
 ARTIFACT_DIR = "/home/lichess-artifacts"
 
@@ -71,7 +71,7 @@ def asset_profile(ssh, *,
         "deploy_dir": deploy_dir,
         "files": ASSETS_FILES,
         "workflow_url": ASSETS_BUILD_URL,
-        "artifact_name": "lila-assets",
+        "artifact_name": "lishogi-assets",
         "symlinks": ["public"],
         "post": post,
         "asap": asap,
@@ -86,7 +86,7 @@ def server_profile(ssh, *,
         "deploy_dir": deploy_dir,
         "files": SERVER_FILES,
         "workflow_url": SERVER_BUILD_URL,
-        "artifact_name": "lila-server",
+        "artifact_name": "lishogi-server",
         "symlinks": ["lib", "bin"],
         "post": post,
         "asap": asap,
@@ -260,7 +260,7 @@ def deploy_script(profile, session, run, url):
         for symlink in profile["symlinks"]
     ] + [
         f"chown -R lichess:lichess {deploy_dir}",
-        f"chmod -f +x {deploy_dir}/bin/lila || true",
+        f"chmod -f +x {deploy_dir}/bin/lishogi || true",
         f"echo \"SSH: {profile['ssh']}\"",
         f"echo \"Deploying immediately.\"" if profile["asap"] else f"/bin/bash -c \"read -n 1 -p 'PRESS ENTER TO RUN: {profile['post']}'\"",
         profile["post"],
@@ -274,7 +274,7 @@ def deploy(profile, repo, commit, github_api_token, dry_run):
 
     session = requests.Session()
     session.headers["Authorization"] = f"token {github_api_token}"
-    session.headers["User-Agent"] = "ornicar/lila"
+    session.headers["User-Agent"] = "ornicar/lishogi"
 
     try:
         wanted_hash = hash_files(commit.tree, profile["files"])

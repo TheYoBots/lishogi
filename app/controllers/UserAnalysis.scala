@@ -8,17 +8,17 @@ import play.api.libs.json.Json
 import play.api.mvc._
 import scala.concurrent.duration._
 
-import lila.api.Context
-import lila.app._
-import lila.game.Pov
-import lila.round.Forecast.{ forecastJsonWriter, forecastStepJsonFormat }
-import lila.round.JsonView.WithFlags
+import lishogi.api.Context
+import lishogi.app._
+import lishogi.game.Pov
+import lishogi.round.Forecast.{ forecastJsonWriter, forecastStepJsonFormat }
+import lishogi.round.JsonView.WithFlags
 import views._
 
 final class UserAnalysis(
     env: Env,
     gameC: => Game
-) extends LilaController(env)
+) extends lishogiController(env)
     with TheftPrevention {
 
   def index = load("", Standard)
@@ -39,7 +39,7 @@ final class UserAnalysis(
 
   def load(urlFen: String, variant: Variant) =
     Open { implicit ctx =>
-      val decodedFen: Option[FEN] = lila.common.String
+      val decodedFen: Option[FEN] = lishogi.common.String
         .decodeUriPath(urlFen)
         .map(_.replace('_', ' ').trim)
         .filter(_.nonEmpty)
@@ -61,16 +61,16 @@ final class UserAnalysis(
 
   private[controllers] def makePov(from: SituationPlus): Pov =
     Pov(
-      lila.game.Game
+      lishogi.game.Game
         .make(
           shogi = shogi.Game(
             situation = from.situation,
             turns = from.turns
           ),
-          sentePlayer = lila.game.Player.make(shogi.Sente, none),
-          gotePlayer = lila.game.Player.make(shogi.Gote, none),
+          sentePlayer = lishogi.game.Player.make(shogi.Sente, none),
+          gotePlayer = lishogi.game.Player.make(shogi.Gote, none),
           mode = shogi.Mode.Casual,
-          source = lila.game.Source.Api,
+          source = lishogi.game.Source.Api,
           pgnImport = None
         )
         .withId("synthetic"),
@@ -109,14 +109,14 @@ final class UserAnalysis(
       }
     }
 
-  private def mobileAnalysis(pov: Pov, apiVersion: lila.common.ApiVersion)(implicit
+  private def mobileAnalysis(pov: Pov, apiVersion: lishogi.common.ApiVersion)(implicit
       ctx: Context
   ): Fu[Result] =
     env.game.gameRepo initialFen pov.gameId flatMap { initialFen =>
       gameC.preloadUsers(pov.game) zip
         (env.analyse.analyser get pov.game) zip
         env.game.crosstableApi(pov.game) flatMap { case _ ~ analysis ~ crosstable =>
-          import lila.game.JsonView.crosstableWrites
+          import lishogi.game.JsonView.crosstableWrites
           env.api.roundApi.review(
             pov,
             apiVersion,
@@ -163,7 +163,7 @@ final class UserAnalysis(
 
   def forecasts(fullId: String) =
     AuthBody(parse.json) { implicit ctx => _ =>
-      import lila.round.Forecast
+      import lishogi.round.Forecast
       OptionFuResult(env.round.proxyRepo pov fullId) { pov =>
         if (isTheft(pov)) fuccess(theftResponse)
         else
@@ -185,7 +185,7 @@ final class UserAnalysis(
 
   def forecastsOnMyTurn(fullId: String, uci: String) =
     AuthBody(parse.json) { implicit ctx => _ =>
-      import lila.round.Forecast
+      import lishogi.round.Forecast
       OptionFuResult(env.round.proxyRepo pov fullId) { pov =>
         if (isTheft(pov)) fuccess(theftResponse)
         else
@@ -196,7 +196,7 @@ final class UserAnalysis(
               forecasts => {
                 val wait = 50 + (Forecast maxPlies forecasts min 10) * 50
                 env.round.forecastApi.playAndSave(pov, uci, forecasts) >>
-                  lila.common.Future.sleep(wait.millis) inject
+                  lishogi.common.Future.sleep(wait.millis) inject
                   Ok(Json.obj("reload" -> true))
               }
             )

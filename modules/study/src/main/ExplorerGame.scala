@@ -1,16 +1,16 @@
-package lila.study
+package lishogi.study
 
 import scala.util.chaining._
 
 import shogi.format.FEN
 import shogi.format.pgn.Parser
-import lila.game.{ Game, Namer }
-import lila.tree.Node.Comment
+import lishogi.game.{ Game, Namer }
+import lishogi.tree.Node.Comment
 
 final private class ExplorerGame(
-    importer: lila.explorer.ExplorerImporter,
-    lightUserApi: lila.user.LightUserApi,
-    net: lila.common.config.NetConfig
+    importer: lishogi.explorer.ExplorerImporter,
+    lightUserApi: lishogi.user.LightUserApi,
+    net: lishogi.common.config.NetConfig
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
   def quote(gameId: Game.ID): Fu[Option[Comment]] =

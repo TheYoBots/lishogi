@@ -17,7 +17,7 @@
   "dependencies": {
     "chat": "2.0.0",
     "game": "2.0.0",
-    "mithril": "github:ornicar/mithril.js#lila-1"
+    "mithril": "github:ornicar/mithril.js#lishogi-1"
   },
   "scripts": {
     "dev": "rollup --config",

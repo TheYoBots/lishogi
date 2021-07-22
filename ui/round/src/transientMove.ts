@@ -8,7 +8,7 @@ import { RoundSocket } from './socket';
  * This might fix bugs where the board is in a
  * transient, dirty state, where clocks don't tick,
  * eventually causing the player to flag.
- * It will also help with lila-ws restarts.
+ * It will also help with lishogi-ws restarts.
  */
 export default class TransientMove {
   constructor(readonly socket: RoundSocket) {}

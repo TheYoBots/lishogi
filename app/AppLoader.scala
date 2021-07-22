@@ -1,4 +1,4 @@
-package lila.app
+package lishogi.app
 
 import akka.actor.CoordinatedShutdown
 import com.softwaremill.macwire._
@@ -11,10 +11,10 @@ import play.api.routing.Router
 import router.Routes
 
 final class AppLoader extends ApplicationLoader {
-  def load(ctx: ApplicationLoader.Context): Application = new LilaComponents(ctx).application
+  def load(ctx: ApplicationLoader.Context): Application = new lishogiComponents(ctx).application
 }
 
-final class LilaComponents(ctx: ApplicationLoader.Context)
+final class lishogiComponents(ctx: ApplicationLoader.Context)
     extends BuiltInComponentsFromContext(ctx)
     with _root_.controllers.AssetsComponents
     with play.api.libs.ws.ahc.AhcWSComponents {
@@ -23,20 +23,20 @@ final class LilaComponents(ctx: ApplicationLoader.Context)
     _.configure(ctx.environment, ctx.initialConfiguration, Map.empty)
   }
 
-  lila.log("boot").info {
+  lishogi.log("boot").info {
     val java             = System.getProperty("java.version")
     val mem              = Runtime.getRuntime().maxMemory() / 1024 / 1024
     val appVersionCommit = ~configuration.getOptional[String]("app.version.commit")
     val appVersionDate   = ~configuration.getOptional[String]("app.version.date")
-    s"lila $appVersionCommit $appVersionDate / java ${java}, memory: ${mem}MB"
+    s"lishogi $appVersionCommit $appVersionDate / java ${java}, memory: ${mem}MB"
   }
 
-  lila.mon.start(configuration.get[Boolean]("kamon.enabled"))
+  lishogi.mon.start(configuration.get[Boolean]("kamon.enabled"))
 
   import _root_.controllers._
 
   // we want to use the legacy session cookie baker
-  // for compatibility with lila-ws
+  // for compatibility with lishogi-ws
   def cookieBaker = new LegacySessionCookieBaker(httpConfiguration.session, cookieSigner)
 
   override lazy val requestFactory: RequestFactory = {
@@ -48,12 +48,12 @@ final class LilaComponents(ctx: ApplicationLoader.Context)
     )
   }
 
-  lazy val httpFilters = Seq(wire[lila.app.http.HttpFilter])
+  lazy val httpFilters = Seq(wire[lishogi.app.http.HttpFilter])
 
   override lazy val httpErrorHandler = {
     @nowarn def someRouter = router.some
     @nowarn def mapper     = devContext.map(_.sourceMapper)
-    wire[lila.app.http.ErrorHandler]
+    wire[lishogi.app.http.ErrorHandler]
   }
 
   implicit def system = actorSystem
@@ -65,8 +65,8 @@ final class LilaComponents(ctx: ApplicationLoader.Context)
 
   lazy val shutdown = CoordinatedShutdown(system)
 
-  lazy val boot: lila.app.EnvBoot = wire[lila.app.EnvBoot]
-  lazy val env: lila.app.Env      = boot.env
+  lazy val boot: lishogi.app.EnvBoot = wire[lishogi.app.EnvBoot]
+  lazy val env: lishogi.app.Env      = boot.env
 
   lazy val account: Account               = wire[Account]
   lazy val analyse: Analyse               = wire[Analyse]
@@ -138,7 +138,7 @@ final class LilaComponents(ctx: ApplicationLoader.Context)
   }
 
   if (configuration.get[Boolean]("kamon.enabled")) {
-    lila.log("boot").info("Kamon is enabled")
+    lishogi.log("boot").info("Kamon is enabled")
     kamon.Kamon.loadModules()
   }
 }
